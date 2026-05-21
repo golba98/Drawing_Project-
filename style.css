@@ -4170,3 +4170,128 @@ html, body {
   color: rgba(33, 25, 14, 0.36);
   margin-bottom: 2px;
 }
+
+/* ── fix/yellow-gold-dark-academic-theme ── */
+
+/* A. Redefine blue variable palette → gold/warm (handles ~80% of navy via cascade) */
+:root {
+  --navy:          #C8922A;
+  --navy-soft:     #F0E4C8;
+  --accent:        var(--navy);
+  --accent-dark:   #A66A1F;
+  --accent-soft:   var(--navy-soft);
+  --blue-soft:     #F4EFE3;
+  --line-blue:     #C8B48A;
+  --gold-bright:   #E5B94E;
+  --surface-elevated: #1D1811;
+  --ink-dark:      #1C140B;
+  --muted-dark:    #6F614C;
+  --border-soft:   rgba(244, 239, 227, 0.12);
+}
+
+/* B. Dark mode: replace navy surface (#1b2232) and blue accent (#8fb4ff) */
+:root[data-theme="dark"] {
+  --surface:       #17130E;
+  --navy:          #C8922A;
+  --navy-soft:     rgba(200, 146, 42, 0.18);
+  --accent:        #C8922A;
+  --accent-dark:   #E5B94E;
+  --accent-soft:   rgba(200, 146, 42, 0.18);
+  --line-blue:     #9A8060;
+}
+
+/* C1. Modal overlay: replace navy rgba */
+.modal-overlay {
+  background: rgba(10, 7, 4, 0.65) !important;
+}
+
+/* C2. Modal text input focus: replace navy glow */
+.modal-box input[type="text"]:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 4px rgba(200, 146, 42, 0.14) !important;
+}
+
+/* C3. Color dot selected ring: replace navy glow */
+.color-dot.active {
+  box-shadow: 0 0 0 3px rgba(200, 146, 42, 0.35) !important;
+}
+
+/* C4. Theme/page-theme card selected: replace navy box-shadow */
+.theme-option-card.active,
+.page-theme-option-card.active,
+.theme-option-card.active:hover,
+.page-theme-option-card.active:hover {
+  box-shadow: 0 4px 12px rgba(200, 146, 42, 0.1) !important;
+}
+
+/* C5. Save button: dark text on gold, warm shadow, rectangular */
+.header-save-btn {
+  color: #1C140B !important;
+  box-shadow: 0 4px 10px rgba(200, 146, 42, 0.3) !important;
+  border-radius: 4px !important;
+}
+.header-save-btn:hover {
+  background: var(--accent-dark) !important;
+}
+
+/* C6. Slider: replace navy accent with gold */
+#editor-header input[type="range"] {
+  accent-color: var(--gold) !important;
+}
+
+/* C7. Pen tool active: was navy-blue tint */
+.tool-btn.active[data-tool="pen"] {
+  background: #F0E4C8 !important;
+  box-shadow: 0 5px 10px rgba(200, 146, 42, 0.22) !important;
+}
+
+/* C8. Line/spray tool active: was literal #3b5f88 navy + blue-soft */
+.tool-btn.active[data-tool="line"],
+.tool-btn.active[data-tool="spray"] {
+  border-color: var(--gold) !important;
+  background: #F4EFE3 !important;
+  box-shadow: 0 5px 10px rgba(200, 146, 42, 0.2) !important;
+}
+
+/* C9. Lined page button preview: replace #bfd0dc lines with warm tan */
+.page-btn[data-page="lined"] {
+  background-image: repeating-linear-gradient(
+    to bottom, transparent 0, transparent 4px,
+    #C8B48A 4px, #C8B48A 5px
+  ) !important;
+}
+
+/* C10. Eraser mode button active: replace navy */
+.eraser-mode-btn.active {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+  background: rgba(200, 146, 42, 0.08) !important;
+}
+
+/* C11. Book spine two (was #2F3A2B olive-green) */
+.book-two { background: #7A4E1D !important; }
+
+/* C12. Book spine six (was #41402D olive) */
+.book-six { background: #6D5A2A !important; }
+
+/* C13. Stat card strip 3 (was #53604B olive-green) */
+.stats-row .stat-card:nth-child(3)::before,
+.stat-card:nth-child(3)::before {
+  background: #A66A1F !important;
+}
+
+/* C14. Old notebook-card literal hex (was #263f67) — defensive */
+.notebook-card {
+  background: #1D1811 !important;
+}
+
+/* C15. Notebook-card cover-navy spine (was #13243d) */
+.notebook-card.cover-navy .notebook-spine {
+  background: #6B4A14 !important;
+}
+
+/* C16. Dark mode active card shadow cleanup */
+:root[data-theme="dark"] .theme-option-card.active,
+:root[data-theme="dark"] .page-theme-option-card.active {
+  box-shadow: 0 4px 12px rgba(200, 146, 42, 0.12) !important;
+}
