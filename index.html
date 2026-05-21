@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Notebooks</title>
 
-  <!-- Dark academic fonts -->
+  <!-- Dark academic / premium fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Editor / card fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&family=Architects+Daughter&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 
@@ -22,8 +20,8 @@
   <script defer src="app/StorageManager.js"></script>
   <script defer src="app/ThemeManager.js"></script>
 
-  <!-- p5 helpers -->
   <script defer src="ui/PageBackground.js"></script>
+  <script defer src="ui/Bookshelf.js"></script>
 
   <!-- Tool classes before Toolbox -->
   <script defer src="tools/PenTool.js"></script>
@@ -44,105 +42,177 @@
 
   <!-- ═══ View 1: File Manager (dark academic dashboard) ═══════════════════ -->
   <div id="file-manager-view">
-    <main class="dashboard-shell">
-      <nav class="topbar" aria-label="Notebook dashboard navigation">
-        <section class="brand-block" aria-labelledby="page-title">
-          <div class="brand-heading-row">
-            <div>
-              <h1 id="page-title">My Notebooks</h1>
-              <p class="brand-subtitle">Organise your class notes, sketches, and study pages.</p>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <h1>My Notebooks</h1>
+          <p>Study workspace</p>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-label">Navigation</span>
+
+          <button class="nav-item filter-tab active" data-filter="all">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+            All Notebooks
+            <span class="nav-dot"></span>
+          </button>
+
+          <button class="nav-item filter-tab" data-filter="recent">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/><line x1="5.5" y1="5.5" x2="10.5" y2="5.5"/><line x1="5.5" y1="8" x2="10.5" y2="8"/><line x1="5.5" y1="10.5" x2="8.5" y2="10.5"/></svg>
+            Recent Notes
+          </button>
+
+          <button class="nav-item filter-tab" data-filter="lined">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="10" height="10" rx="1.5"/><line x1="3" y1="6.5" x2="13" y2="6.5"/><line x1="6.5" y1="6.5" x2="6.5" y2="13"/></svg>
+            Lined Paper
+          </button>
+
+          <button class="nav-item filter-tab" data-filter="blank">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1.5"/></svg>
+            Blank Paper
+          </button>
+
+          <button class="nav-item filter-tab" data-filter="all">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12V4l4-2 4 2 4-2v8l-4 2-4-2-4 2z"/><line x1="6" y1="2" x2="6" y2="12"/><line x1="10" y1="4" x2="10" y2="14"/></svg>
+            Binder Books
+          </button>
+
+          <button class="nav-item filter-tab" data-filter="all">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1"/><path d="M5 14h6"/><line x1="8" y1="11" x2="8" y2="14"/></svg>
+            Study Pages
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <span class="sidebar-label">Subjects</span>
+
+          <button class="nav-item subject-filter-btn" data-subject="Computer Science">
+            <span style="width:8px;height:8px;border-radius:50%;background:#2E5B8E;flex-shrink:0;display:inline-block;"></span>
+            CM1025 · CompSci
+          </button>
+          <button class="nav-item subject-filter-btn" data-subject="Maths">
+            <span style="width:8px;height:8px;border-radius:50%;background:#7B3E8E;flex-shrink:0;display:inline-block;"></span>
+            CM1020 · Maths
+          </button>
+          <button class="nav-item subject-filter-btn" data-subject="Physics">
+            <span style="width:8px;height:8px;border-radius:50%;background:#8E3E2E;flex-shrink:0;display:inline-block;"></span>
+            Physics
+          </button>
+          <button class="nav-item subject-filter-btn" data-subject="Sketches">
+            <span style="width:8px;height:8px;border-radius:50%;background:#2E7B6B;flex-shrink:0;display:inline-block;"></span>
+            Sketches
+          </button>
+          <button class="nav-item subject-filter-btn" data-subject="Other">
+            <span style="width:8px;height:8px;border-radius:50%;background:#5C7A2E;flex-shrink:0;display:inline-block;"></span>
+            Other Notes
+          </button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="semester-badge">
+            <div class="sem-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#C8952A" stroke-width="1.5"><rect x="1" y="2" width="12" height="11" rx="1.5"/><line x1="1" y1="5.5" x2="13" y2="5.5"/><line x1="4.5" y1="1" x2="4.5" y2="4"/><line x1="9.5" y1="1" x2="9.5" y2="4"/></svg>
             </div>
-            <span class="workspace-tag">Semester Workspace</span>
-          </div>
-        </section>
-
-        <section class="nav-actions" aria-label="Notebook actions">
-          <label class="search-field">
-            <span class="sr-only">Search subjects or notebooks</span>
-            <!-- id="fm-search" required by FileManagerView.js -->
-            <input id="fm-search" type="search" placeholder="Search subjects or notebooks..." autocomplete="off">
-          </label>
-          <!-- id="new-notebook-btn" required by FileManagerView.js -->
-          <button id="new-notebook-btn" class="new-notebook-btn" type="button" aria-label="Create new notebook">
-            <svg aria-hidden="true" viewBox="0 0 16 16" focusable="false">
-              <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/>
-            </svg>
-            <span>New Notebook</span>
-          </button>
-          <!-- id="fm-settings-btn" required by ThemeManager.js -->
-          <button id="fm-settings-btn" class="settings-btn" type="button" aria-label="Open settings">
-            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-              <path d="M12 8.35a3.65 3.65 0 1 0 0 7.3 3.65 3.65 0 0 0 0-7.3Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M19.2 13.35v-2.7l-2.18-.42a5.68 5.68 0 0 0-.58-1.4l1.24-1.82-1.9-1.9-1.82 1.24c-.44-.24-.91-.44-1.4-.58L12.15 3h-2.7l-.42 2.18c-.49.14-.96.34-1.4.58L5.8 4.52l-1.9 1.9 1.24 1.82c-.24.44-.44.91-.58 1.4L2.4 10.05v2.7l2.16.42c.14.5.34.97.58 1.41L3.9 16.4l1.9 1.9 1.82-1.24c.44.24.91.43 1.4.58l.42 2.16h2.7l.42-2.16c.49-.15.96-.34 1.4-.58l1.82 1.24 1.9-1.9-1.24-1.82c.24-.44.44-.91.58-1.41l2.18-.42Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </section>
-      </nav>
-
-      <section class="stats-row" aria-label="Notebook overview">
-        <article class="stat-card stat-card-wide">
-          <svg class="stat-card-icon" viewBox="0 0 20 20" width="18" height="18" fill="none"
-               stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <rect x="3" y="4" width="14" height="13" rx="1.5"/>
-            <path d="M7 2v4M13 2v4M3 9h14"/>
-          </svg>
-          <span class="stat-label">TODAY'S CLASS</span>
-          <!-- id="stat-timetable-val" updated dynamically by FileManagerView.js -->
-          <strong id="stat-timetable-val">Software Eng</strong>
-        </article>
-        <article class="stat-card">
-          <svg class="stat-card-icon" viewBox="0 0 20 20" width="18" height="18" fill="none"
-               stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <circle cx="10" cy="10" r="7.5"/>
-            <path d="M10 6.5v4l2.5 2.5"/>
-          </svg>
-          <strong id="stat-recent-val">0</strong>
-          <span class="stat-label">Recent Notes</span>
-        </article>
-        <article class="stat-card">
-          <svg class="stat-card-icon" viewBox="0 0 20 20" width="18" height="18" fill="none"
-               stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <path d="M4 3h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4V3z"/>
-            <path d="M4 3H3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h1"/>
-            <path d="M13 6H7M13 9H7M13 12H7"/>
-          </svg>
-          <strong id="stat-total-val">0</strong>
-          <span class="stat-label">Binder Books</span>
-        </article>
-        <article class="stat-card">
-          <svg class="stat-card-icon" viewBox="0 0 20 20" width="18" height="18" fill="none"
-               stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <rect x="3.5" y="2.5" width="13" height="15" rx="1"/>
-            <path d="M7 7h6M7 10h6M7 13h4"/>
-          </svg>
-          <strong id="stat-lined-val">0</strong>
-          <span class="stat-label">Study Pages</span>
-        </article>
-      </section>
-
-      <section class="tabs" aria-label="Notebook filters">
-        <!-- filter-tab class + data-filter attribute required by FileManagerView.js -->
-        <button class="tab filter-tab is-active active" type="button" data-tab="all" data-filter="all" aria-selected="true">All Notes</button>
-        <button class="tab filter-tab" type="button" data-tab="recent" data-filter="recent" aria-selected="false">Recent</button>
-        <button class="tab filter-tab" type="button" data-tab="lined" data-filter="lined" aria-selected="false">Lined Paper</button>
-        <button class="tab filter-tab" type="button" data-tab="blank" data-filter="blank" aria-selected="false">Blank Paper</button>
-      </section>
-
-      <section class="shelf-panel" aria-label="Notebook shelf">
-        <div class="shelf-heading">
-          <svg class="shelf-heading-icon" viewBox="0 0 24 24" width="26" height="26" fill="none"
-               stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-            <path d="M3 7a2 2 0 0 1 2-2h3.17l2.17 2.5H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
-          </svg>
-          <div class="shelf-heading-text">
-            <h2>My Notebook Shelf</h2>
-            <p>Pick a subject book to open on the desk.</p>
+            <div>
+              <span>Semester 2026</span>
+              <small>Spring · UoL Goldsmiths</small>
+            </div>
           </div>
         </div>
-        <!-- #notebook-grid: FileManagerView renders notebook cards and empty state here -->
-        <div id="notebook-grid" class="notebook-shelf"></div>
-      </section>
-    </main>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <div class="search-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4"/><line x1="9.5" y1="9.5" x2="13" y2="13"/></svg>
+            <input type="text" placeholder="Search subjects or notebooks…" id="fm-search" autocomplete="off">
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-ghost" id="fm-settings-btn">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="2.5"/><path d="M6.5 1v1.5M6.5 10v1.5M1 6.5h1.5M10 6.5h1.5M2.6 2.6l1 1M9.4 9.4l1 1M2.6 10.4l1-1M9.4 3.6l1-1"/></svg>
+              Settings
+            </button>
+            <button class="btn btn-primary" id="new-notebook-btn">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+              New Notebook
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <!-- QUICK CARDS -->
+          <div class="quick-cards">
+            <div class="quick-card" style="--card-accent:#C8952A;">
+              <div class="card-label">
+                <svg class="card-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="12" height="11" rx="1.5"/><line x1="1" y1="5.5" x2="13" y2="5.5"/><line x1="4.5" y1="1" x2="4.5" y2="4"/><line x1="9.5" y1="1" x2="9.5" y2="4"/></svg>
+                Today's Class
+              </div>
+              <div class="card-title" id="stat-timetable-val">Thursday</div>
+              <div class="card-sub">Active Subject</div>
+            </div>
+
+            <div class="quick-card" style="--card-accent:#7B3E8E;">
+              <div class="card-label">
+                <svg class="card-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><polyline points="7,4 7,7 9,9"/></svg>
+                Recent Notes
+              </div>
+              <div class="card-title" id="stat-recent-val">0</div>
+              <div class="card-sub">Updated recently</div>
+            </div>
+
+            <div class="quick-card" style="--card-accent:#2E5B8E;">
+              <div class="card-label">
+                <svg class="card-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="12" rx="1"/><line x1="2" y1="4.5" x2="12" y2="4.5"/><line x1="4.5" y1="1" x2="4.5" y2="13"/></svg>
+                Binder Books
+              </div>
+              <div class="card-title" id="stat-total-val">0</div>
+              <div class="card-sub">Total notebooks</div>
+            </div>
+
+            <div class="quick-card" style="--card-accent:#2E7B6B;">
+              <div class="card-label">
+                <svg class="card-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="12" rx="1"/><line x1="4" y1="5" x2="10" y2="5"/><line x1="4" y1="7.5" x2="10" y2="7.5"/><line x1="4" y1="10" x2="7.5" y2="10"/></svg>
+                Study Pages
+              </div>
+              <div class="card-title" id="stat-lined-val">0</div>
+              <div class="card-sub">Lined notebooks</div>
+            </div>
+          </div>
+
+          <!-- TABS -->
+          <div class="tabs">
+            <button class="tab filter-tab active" data-filter="all">All Notes</button>
+            <button class="tab filter-tab" data-filter="recent">Recent</button>
+            <button class="tab filter-tab" data-filter="lined">Lined Paper</button>
+            <button class="tab filter-tab" data-filter="blank">Blank Paper</button>
+          </div>
+
+          <!-- BOOKSHELF -->
+          <div class="shelf-section" id="shelf-section-wrapper">
+            <div class="shelf-header">
+              <div class="shelf-header-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#C8952A" stroke-width="1.5"><path d="M2 13V3l3-1 4 1.5L12 2v10l-3 1-4-1.5L2 13z"/><line x1="5" y1="2" x2="5" y2="12"/><line x1="9" y1="3.5" x2="9" y2="13.5"/></svg>
+              </div>
+              <div>
+                <h2>My Notebook Shelf</h2>
+                <p>Hover a book to preview · click to open on desk</p>
+              </div>
+            </div>
+            <div id="bookshelf-canvas"></div>
+          </div>
+
+          <!-- NOTES GRID (Target grid loaded dynamically) -->
+          <div id="notebook-grid">
+            <!-- Injected by FileManagerView.js -->
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 
 

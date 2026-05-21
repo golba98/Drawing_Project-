@@ -10,11 +10,17 @@ const FileManagerView = {
   _selectedSubject:    'Computer Science',
   _selectedCoverColor: 'navy',
   _selectedPaperTheme: 'system',
+  _subjectFilter:      null,
 
   init() {
     this._container = document.getElementById('file-manager-view');
     this._grid      = document.getElementById('notebook-grid');
     this._modal     = document.getElementById('new-notebook-modal');
+
+    // Initialize 3D Bookshelf
+    if (typeof BookshelfController !== 'undefined') {
+      BookshelfController.init();
+    }
 
     // New Notebook button
     document.getElementById('new-notebook-btn')
@@ -69,12 +75,53 @@ const FileManagerView = {
       });
     });
 
-    // Filter tabs
+    // Filter tabs & sidebar navigation items
     document.querySelectorAll('.filter-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        this._currentFilter = tab.dataset.filter;
+        const filter = tab.dataset.filter;
+        this._currentFilter = filter;
+        this._subjectFilter = null;
+
+        // Deactivate all subject buttons
+        document.querySelectorAll('.subject-filter-btn').forEach(btn => btn.classList.remove('active'));
+
+        // Sync active state on all matching tabs / nav items
+        document.querySelectorAll('.filter-tab').forEach(t => {
+          if (t.dataset.filter === filter) {
+            t.classList.add('active');
+          } else {
+            t.classList.remove('active');
+          }
+        });
+
+        this.render();
+      });
+    });
+
+    // Subject filters in sidebar
+    document.querySelectorAll('.subject-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const subject = btn.dataset.subject;
+        if (this._subjectFilter === subject) {
+          // Toggle off
+          this._subjectFilter = null;
+          btn.classList.remove('active');
+        } else {
+          // Toggle on
+          this._subjectFilter = subject;
+          document.querySelectorAll('.subject-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Reset normal filter tabs to 'all'
+          this._currentFilter = 'all';
+          document.querySelectorAll('.filter-tab').forEach(t => {
+            if (t.dataset.filter === 'all') {
+              t.classList.add('active');
+            } else {
+              t.classList.remove('active');
+            }
+          });
+        }
         this.render();
       });
     });
@@ -108,7 +155,7 @@ const FileManagerView = {
     const linedCount = notebooks.filter(nb => nb.pageMode === 'lined').length;
     const blankCount = notebooks.filter(nb => nb.pageMode === 'blank').length;
 
-        const totalVal = document.getElementById('stat-total-val');
+    const totalVal = document.getElementById('stat-total-val');
     const recentVal = document.getElementById('stat-recent-val');
     const linedVal = document.getElementById('stat-lined-val');
 
@@ -141,6 +188,26 @@ const FileManagerView = {
       notebooks = notebooks.filter(nb => nb.updatedAt > cutoff);
     } else if (this._currentFilter === 'lined' || this._currentFilter === 'blank') {
       notebooks = notebooks.filter(nb => nb.pageMode === this._currentFilter);
+    }
+
+    // Apply subject filter
+    if (this._subjectFilter) {
+      notebooks = notebooks.filter(nb =>
+        nb.subject && nb.subject.toLowerCase() === this._subjectFilter.toLowerCase()
+      );
+    }
+
+    // Manage bookshelf visibility and synchronization
+    const shelfWrapper = document.getElementById('shelf-section-wrapper');
+    if (shelfWrapper) {
+      if (notebooks.length === 0) {
+        shelfWrapper.classList.add('hidden');
+      } else {
+        shelfWrapper.classList.remove('hidden');
+        if (typeof BookshelfController !== 'undefined') {
+          BookshelfController.update(notebooks);
+        }
+      }
     }
 
     if (notebooks.length === 0) {
@@ -224,7 +291,12 @@ const FileManagerView = {
         <div class="da-card-thumb-area">
           ${nb.drawingDataUrl
             ? `<img src="${nb.drawingDataUrl}" alt="Drawing preview">`
-            : `<div class="da-card-thumb-empty">${nb.pageMode === 'lined' ? '&#8801;' : '&#9633;'}</div>`}
+            : `<div class="da-card-thumb-empty-lines">
+                 <div class="da-note-line"></div>
+                 <div class="da-note-line"></div>
+                 <div class="da-note-line"></div>
+                 <div class="da-note-line"></div>
+               </div>`}
         </div>
         <footer class="da-card-footer">
           <span class="da-card-badge">${modeLabel}</span>
