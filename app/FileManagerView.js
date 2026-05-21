@@ -1,11 +1,12 @@
 // app/FileManagerView.js
-// Renders the GoodNotes-style notebook library and handles all file-manager interactions.
-// Uses innerHTML rendering — no framework needed.
+// Renders the notebook library and handles all file-manager interactions.
 
 const FileManagerView = {
-  _container: null,
-  _grid:      null,
-  _modal:     null,
+  _container:     null,
+  _grid:          null,
+  _modal:         null,
+  _currentFilter: 'all',   // 'all' | 'recent' | 'lined' | 'blank'
+  _searchQuery:   '',
 
   init() {
     this._container = document.getElementById('file-manager-view');
@@ -22,7 +23,7 @@ const FileManagerView = {
     document.getElementById('modal-create')
       .addEventListener('click', () => this._handleCreate());
 
-    // Close modal when clicking the dark overlay (outside the box)
+    // Close modal when clicking the dark overlay
     this._modal.addEventListener('click', e => {
       if (e.target === this._modal) this.closeModal();
     });
@@ -32,6 +33,25 @@ const FileManagerView = {
       .addEventListener('keydown', e => {
         if (e.key === 'Enter') this._handleCreate();
       });
+
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this._currentFilter = tab.dataset.filter;
+        this.render();
+      });
+    });
+
+    // Live search
+    const searchInput = document.getElementById('fm-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        this._searchQuery = searchInput.value.toLowerCase().trim();
+        this.render();
+      });
+    }
   },
 
   show() {
@@ -44,9 +64,27 @@ const FileManagerView = {
   },
 
   render() {
-    const notebooks = StorageManager.getNotebooks();
+    let notebooks = StorageManager.getNotebooks(); // already sorted by updatedAt desc
+
+    // Apply search filter
+    if (this._searchQuery) {
+      notebooks = notebooks.filter(nb =>
+        nb.title.toLowerCase().includes(this._searchQuery)
+      );
+    }
+
+    // Apply tab filter
+    if (this._currentFilter === 'recent') {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      notebooks = notebooks.filter(nb => nb.updatedAt > cutoff);
+    } else if (this._currentFilter === 'lined' || this._currentFilter === 'blank') {
+      notebooks = notebooks.filter(nb => nb.pageMode === this._currentFilter);
+    }
+
     if (notebooks.length === 0) {
       this._grid.innerHTML = this._emptyStateHTML();
+      const btn = this._grid.querySelector('.empty-create-btn');
+      if (btn) btn.addEventListener('click', () => this.openModal());
     } else {
       this._grid.innerHTML = notebooks.map(nb => this._cardHTML(nb)).join('');
       this._wireCardActions();
@@ -55,10 +93,8 @@ const FileManagerView = {
 
   openModal() {
     document.getElementById('notebook-title-input').value = 'Untitled Notebook';
-    // Default to lined
     document.getElementById('page-mode-lined').checked = true;
     this._modal.classList.remove('hidden');
-    // Select the title text so the user can type immediately
     setTimeout(() => document.getElementById('notebook-title-input').select(), 50);
   },
 
@@ -69,7 +105,7 @@ const FileManagerView = {
   // ─── Private ───────────────────────────────────────────────────────────────
 
   _cardHTML(nb) {
-    const date = new Date(nb.updatedAt);
+    const date    = new Date(nb.updatedAt);
     const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
     const modeLabel = nb.pageMode === 'lined' ? 'Lined' : 'Blank';
@@ -99,17 +135,29 @@ const FileManagerView = {
   },
 
   _emptyStateHTML() {
+    // Show a polished empty library state with a decorative notebook preview and a CTA
+    const isFiltered = this._currentFilter !== 'all' || this._searchQuery;
+    if (isFiltered) {
+      return `
+        <div class="empty-state">
+          <p class="empty-title">No results</p>
+          <p class="empty-sub">Try a different search or filter.</p>
+        </div>
+      `;
+    }
     return `
       <div class="empty-state">
-        <img src="assets/icons/notebook.svg" alt="" class="empty-icon">
+        <div class="empty-preview lined"></div>
         <p class="empty-title">No notebooks yet</p>
-        <p class="empty-sub">Click <strong>New Notebook</strong> to create your first one.</p>
+        <p class="empty-sub">Create your first notebook and start drawing.</p>
+        <button class="empty-create-btn">Create notebook</button>
+        <p class="empty-hint">Choose blank or lined paper.</p>
       </div>
     `;
   },
 
   _wireCardActions() {
-    // Open notebook on card click (but not when clicking action buttons)
+    // Open on card click (not on action button click)
     this._grid.querySelectorAll('.notebook-card').forEach(card => {
       card.addEventListener('click', e => {
         if (!e.target.closest('.card-action-btn')) {
@@ -118,7 +166,6 @@ const FileManagerView = {
       });
     });
 
-    // Rename
     this._grid.querySelectorAll('.rename-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -126,7 +173,6 @@ const FileManagerView = {
       });
     });
 
-    // Delete
     this._grid.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();

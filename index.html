@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notebook Drawing App</title>
+  <title>Notebook</title>
   <link rel="stylesheet" href="style.css">
 
   <!-- p5.js pinned to 1.9.4 for stable erase() API -->
@@ -16,7 +16,7 @@
   <!-- p5 helpers -->
   <script defer src="ui/PageBackground.js"></script>
 
-  <!-- Tool classes before Toolbox (Toolbox instantiates them in its constructor) -->
+  <!-- Tool classes before Toolbox -->
   <script defer src="tools/PenTool.js"></script>
   <script defer src="tools/HighlighterTool.js"></script>
   <script defer src="tools/EraserTool.js"></script>
@@ -24,11 +24,11 @@
   <script defer src="tools/SprayTool.js"></script>
   <script defer src="tools/Toolbox.js"></script>
 
-  <!-- View controllers after tools (their event handlers reference toolbox global) -->
+  <!-- View controllers -->
   <script defer src="app/FileManagerView.js"></script>
   <script defer src="app/EditorView.js"></script>
 
-  <!-- sketch.js last — defines setup/draw and calls view inits -->
+  <!-- sketch.js last -->
   <script defer src="sketch.js"></script>
 </head>
 <body>
@@ -37,109 +37,130 @@
   <div id="file-manager-view">
 
     <header id="fm-header">
-      <h1>Notebook Drawing App</h1>
-      <button id="new-notebook-btn" aria-label="Create new notebook">
-        <img src="assets/icons/new-file.svg" alt="">
-        New Notebook
-      </button>
+      <div class="fm-brand">
+        <h1 id="fm-app-name">Notebook</h1>
+        <p id="fm-subtitle">Your digital drawing notebooks</p>
+      </div>
+      <div class="fm-actions">
+        <input type="text" id="fm-search" placeholder="Search notebooks…" autocomplete="off" spellcheck="false">
+        <button id="new-notebook-btn" aria-label="Create new notebook">
+          <img src="assets/icons/new-file.svg" alt="">
+          New Notebook
+        </button>
+      </div>
     </header>
+
+    <!-- Filter tabs -->
+    <div id="fm-filters">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="recent">Recent</button>
+      <button class="filter-tab" data-filter="lined">Lined</button>
+      <button class="filter-tab" data-filter="blank">Blank</button>
+    </div>
 
     <!-- Notebook cards rendered here by FileManagerView.render() -->
     <div id="notebook-grid"></div>
 
   </div>
 
+
   <!-- ═══ View 2: Editor ════════════════════════════════════════════════════ -->
   <div id="editor-view" class="hidden">
 
-    <!-- Top header: back button + notebook title -->
+    <!-- Top header: back + title + controls + save -->
     <div id="editor-header">
       <button id="editor-back-btn" aria-label="Back to library">
         <img src="assets/icons/back.svg" alt="Back">
       </button>
       <span id="editor-title"></span>
+      <div class="editor-header-actions">
+        <label class="ctrl-label" for="colorPicker">Color</label>
+        <input type="color" id="colorPicker" value="#000000" title="Stroke colour">
+        <label class="ctrl-label" for="strokeSize">Size</label>
+        <input type="range" id="strokeSize" min="1" max="40" value="4" title="Stroke size">
+        <span id="sizeLabel">4px</span>
+        <button id="editor-save-btn" class="action-btn header-save-btn" data-action="save" aria-label="Save as PNG">
+          <img src="assets/icons/save.svg" alt="">
+          Save PNG
+        </button>
+      </div>
     </div>
 
-    <!-- Body: left toolbar + canvas area -->
+    <!-- Body: horizontal toolbar + canvas workspace -->
     <div id="editor-body">
 
-      <!-- Left toolbar with drawing tools, page modes, and actions -->
+      <!-- Horizontal tool dock -->
       <div id="editor-toolbar" role="toolbar" aria-label="Drawing tools">
 
         <!-- Drawing tools -->
-        <button class="tool-btn active" data-tool="pen"         title="Pen"         aria-label="Pen tool">
+        <button class="tool-btn active" data-tool="pen"         title="Pen"         aria-label="Pen">
           <img src="assets/icons/pen.svg" alt="Pen">
         </button>
-        <button class="tool-btn"        data-tool="highlighter" title="Highlighter" aria-label="Highlighter tool">
+        <button class="tool-btn"        data-tool="highlighter" title="Highlighter" aria-label="Highlighter">
           <img src="assets/icons/highlighter.svg" alt="Highlighter">
         </button>
-        <button class="tool-btn"        data-tool="eraser"      title="Eraser"      aria-label="Eraser tool">
+        <button class="tool-btn"        data-tool="eraser"      title="Eraser"      aria-label="Eraser">
           <img src="assets/icons/eraser.svg" alt="Eraser">
         </button>
-        <button class="tool-btn"        data-tool="line"        title="Line"        aria-label="Line tool">
+        <button class="tool-btn"        data-tool="line"        title="Line"        aria-label="Line">
           <img src="assets/icons/line.svg" alt="Line">
         </button>
-        <button class="tool-btn"        data-tool="spray"       title="Spray"       aria-label="Spray tool">
+        <button class="tool-btn"        data-tool="spray"       title="Spray"       aria-label="Spray">
           <img src="assets/icons/spray.svg" alt="Spray">
         </button>
 
         <div class="toolbar-divider"></div>
 
         <!-- Page background mode -->
-        <button class="page-btn" data-page="blank" title="Blank page" aria-label="Blank page">
-          <img src="assets/icons/blank-page.svg" alt="Blank page">
+        <button class="page-btn"        data-page="blank" title="Blank page" aria-label="Blank page">
+          <img src="assets/icons/blank-page.svg" alt="Blank">
         </button>
         <button class="page-btn active" data-page="lined" title="Lined page" aria-label="Lined page">
-          <img src="assets/icons/lined-page.svg" alt="Lined page">
+          <img src="assets/icons/lined-page.svg" alt="Lined">
         </button>
 
         <div class="toolbar-divider"></div>
 
-        <!-- Actions -->
-        <button class="action-btn" data-action="clear" title="Clear drawing" aria-label="Clear drawing">
+        <!-- Clear action -->
+        <button class="action-btn" data-action="clear" title="Clear drawing" aria-label="Clear">
           <img src="assets/icons/clear.svg" alt="Clear">
-        </button>
-        <button class="action-btn" data-action="save"  title="Save as PNG"  aria-label="Save as PNG">
-          <img src="assets/icons/save.svg" alt="Save">
         </button>
 
       </div><!-- #editor-toolbar -->
 
-      <!-- p5 canvas is injected here by sketch.js setup() via cnv.parent('canvas-container') -->
-      <div id="canvas-container"></div>
+      <!-- Canvas workspace: dark desk area surrounding the paper canvas -->
+      <div id="canvas-workspace">
+        <!-- p5 canvas injected here by sketch.js setup() via cnv.parent('canvas-container') -->
+        <div id="canvas-container"></div>
+      </div>
 
     </div><!-- #editor-body -->
 
-    <!-- Bottom controls: colour picker + stroke size -->
-    <div id="editor-controls">
-      <label for="colorPicker">Color</label>
-      <input type="color" id="colorPicker" value="#000000" title="Stroke colour">
-      <label for="strokeSize">Size</label>
-      <input type="range" id="strokeSize" min="1" max="40" value="4" title="Stroke size">
-      <span id="sizeLabel">4px</span>
-    </div>
-
   </div><!-- #editor-view -->
+
 
   <!-- ═══ New Notebook Modal ═════════════════════════════════════════════════ -->
   <div id="new-notebook-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Create new notebook">
     <div class="modal-box">
 
-      <h2>New Notebook</h2>
+      <h2>Create notebook</h2>
+      <p class="modal-desc">Choose a name and paper style.</p>
 
       <label for="notebook-title-input">Name</label>
       <input type="text" id="notebook-title-input" value="Untitled Notebook"
              maxlength="80" autocomplete="off" spellcheck="false">
 
-      <label>Page Style</label>
+      <label>Paper style</label>
       <div class="page-style-options">
-        <label>
+        <label class="style-card">
           <input type="radio" id="page-mode-lined" name="pageMode" value="lined" checked>
-          Lined
+          <div class="style-preview lined"></div>
+          <span>Lined</span>
         </label>
-        <label>
+        <label class="style-card">
           <input type="radio" id="page-mode-blank" name="pageMode" value="blank">
-          Blank
+          <div class="style-preview blank"></div>
+          <span>Blank</span>
         </label>
       </div>
 
