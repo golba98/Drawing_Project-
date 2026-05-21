@@ -25,12 +25,16 @@ const StorageManager = {
     return this._load().find(nb => nb.id === id) || null;
   },
 
-  createNotebook({ title, pageMode }) {
+  createNotebook({ title, pageMode, subject, coverColor, pageTheme }) {
     const notebooks = this._load();
+    const globalDefaultPageTheme = typeof ThemeManager !== 'undefined' ? ThemeManager.getPageThemeSetting() : 'system';
     const notebook = {
       id:             Date.now().toString(36) + Math.random().toString(36).slice(2),
       title:          title || 'Untitled Notebook',
       pageMode:       pageMode || 'lined',
+      pageTheme:      pageTheme || globalDefaultPageTheme,
+      subject:        subject || 'Other',
+      coverColor:     coverColor || 'navy',
       drawingDataUrl: null,
       createdAt:      Date.now(),
       updatedAt:      Date.now(),

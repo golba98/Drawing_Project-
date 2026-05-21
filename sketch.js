@@ -16,6 +16,15 @@ let pageBackground;   // PageBackground instance (ui/PageBackground.js)
 let penColor = [0, 0, 0]; // current stroke colour [r, g, b], updated by colour picker
 let penSize  = 4;          // current stroke weight, updated by slider
 
+// Per-tool size settings (independent so changing eraser size won't affect pen size)
+const toolSizes = {
+  pen:         4,
+  highlighter: 20,
+  eraser:      24,
+  line:        4,
+  spray:       30,
+};
+
 let isEditorActive = false; // true only while the editor view is open
 
 // ─── p5.js Lifecycle ─────────────────────────────────────────────────────────
@@ -36,6 +45,14 @@ function setup() {
 
   noLoop(); // keep the draw loop stopped until a notebook is opened
 
+  // Redraw canvas on theme updates
+  window.addEventListener('themeChanged', () => {
+    if (isEditorActive) redraw();
+  });
+  window.addEventListener('pageThemeChanged', () => {
+    if (isEditorActive) redraw();
+  });
+
   // Hand off to the view layer — sketch.js is loaded last so all classes are ready
   FileManagerView.init();
   EditorView.init();
@@ -47,6 +64,7 @@ function draw() {
   pageBackground.draw();          // fills canvas with page background
   image(drawingLayer, 0, 0);      // composite drawing layer on top
   toolbox.drawPreview();          // rubber-band preview (LineTool only, no-op for others)
+  toolbox.drawCursorPreview(window); // eraser cursor preview (no-op for other tools)
 }
 
 // ─── Editor Lifecycle (called by EditorView) ─────────────────────────────────
@@ -85,6 +103,8 @@ function closeEditor() {
 
 // Returns the drawing layer as a base64 PNG string for localStorage persistence.
 // Saves only the drawing layer — NOT the page background — so the data stays small.
+// The eraser cursor preview is drawn on the main canvas each frame, not on drawingLayer,
+// so it never appears in the exported PNG.
 function getDrawingDataUrl() {
   return drawingLayer.canvas.toDataURL('image/png');
 }
@@ -108,6 +128,12 @@ function mouseReleased() {
   if (!isEditorActive) return;
   // No bounds check on release — LineTool must commit even if mouse drifted outside canvas
   toolbox.mouseReleased(window, drawingLayer);
+}
+
+// mouseMoved fires when the mouse moves without buttons held — keeps eraser preview fresh
+function mouseMoved() {
+  if (!isEditorActive) return;
+  if (toolbox.getActiveName() === 'eraser') redraw();
 }
 
 // ─── Window Resize ────────────────────────────────────────────────────────────

@@ -1,24 +1,44 @@
-/* style.css — Notebook App Premium Design System */
+/* style.css — Redesigned School/College Notebook Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
 
 /* ─── Design Tokens ──────────────────────────────────────────────────────── */
 
 :root {
-  --bg:               #ede8de;
-  --surface:          #f7f4ee;
-  --surface-elevated: #ffffff;
-  --ink:              #1c1c2e;
-  --muted:            #8a8a9e;
-  --accent:           #4a6fa5;
-  --accent-dark:      #3a5a8e;
-  --accent-soft:      #edf1f9;
-  --border:           rgba(0, 0, 0, 0.07);
-  --border-strong:    rgba(0, 0, 0, 0.13);
-  --shadow-soft:      0 2px 16px rgba(0, 0, 0, 0.08);
-  --shadow-card:      0 4px 24px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-paper:     0 8px 40px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.10);
-  --shadow-modal:     0 32px 80px rgba(0, 0, 0, 0.22), 0 8px 24px rgba(0, 0, 0, 0.12);
-  --radius-lg:        14px;
-  --radius-xl:        22px;
+  --paper:             #fbf6ea;
+  --paper-deep:        #f1e7d5;
+  --ink:               #1f2937;
+  --muted:             #7c7468;
+  --navy:              #263f67;
+  --navy-soft:         #dce7f6;
+  --sage:              #b8c7a3;
+  --sage-soft:         #edf3e7;
+  --highlight:         #ffe58a;
+  --coral:             #e89b8f;
+  --coral-soft:        #fbf0ee;
+  --line-blue:         #bfd0dc;
+  --margin-red:        #e2aaa2;
+  --folder-tan:        #d8b982;
+  --folder-tan-soft:   #f8f2e7;
+  --blue-soft:         #eaf1f8;
+  
+  --shadow-paper:      0 18px 45px rgba(55, 45, 30, 0.16);
+  --shadow-card:       0 10px 30px rgba(55, 45, 30, 0.08), 0 2px 8px rgba(55, 45, 30, 0.04);
+  --shadow-modal:      0 32px 80px rgba(55, 45, 30, 0.28), 0 8px 24px rgba(55, 45, 30, 0.12);
+  --radius-card:       24px;
+  --radius-lg:         16px;
+  
+  --font-main:         'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hand:         'Architects Daughter', cursive;
+  --font-serif:        'Playfair Display', Georgia, serif;
+  
+  --accent:            var(--navy);
+  --accent-dark:       #192c4b;
+  --accent-soft:       var(--navy-soft);
+  --border:            rgba(55, 45, 30, 0.09);
+  --border-strong:     rgba(55, 45, 30, 0.18);
+  
+  --bg-desk:           #eae3d2;
 }
 
 /* ─── Reset & Base ────────────────────────────────────────────────────────── */
@@ -31,8 +51,8 @@
 
 html, body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  background: var(--bg);
+  font-family: var(--font-main);
+  background: var(--bg-desk);
   color: var(--ink);
   user-select: none;
   -webkit-font-smoothing: antialiased;
@@ -42,75 +62,140 @@ html, body {
   display: none !important;
 }
 
+/* Custom school-supply scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-deep);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border: 2px solid var(--paper-deep);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
-   FILE MANAGER
-═══════════════════════════════════════════════════════════════════════════ */
+   FILE MANAGER (SCHOOL DASHBOARD)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 #file-manager-view {
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background-color: var(--bg-desk);
+  background-image: 
+    radial-gradient(#d3c8b1 1.5px, transparent 1.5px),
+    radial-gradient(#d3c8b1 1.5px, var(--bg-desk) 1.5px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
   overflow-y: auto;
 }
 
-/* ─── Header ──────────────────────────────────────────────────────────────── */
+/* ─── Header Redesign ─────────────────────────────────────────────────────── */
 
 #fm-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 36px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
+  padding: 24px 36px 18px;
+  background: #fdfbf7;
+  border-bottom: 2px solid var(--border-strong);
+  box-shadow: 0 4px 15px rgba(55, 45, 30, 0.04);
   flex-shrink: 0;
+}
+
+.fm-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .fm-brand {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 #fm-app-name {
-  font-size: 19px;
+  font-family: var(--font-serif);
+  font-size: 26px;
   font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.4px;
-  line-height: 1;
+  color: var(--navy);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+}
+
+#fm-app-name::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: 8px;
+  background: rgba(254, 229, 138, 0.65); /* soft warm yellow marker highlight */
+  z-index: -1;
+  transform: skewX(-15deg);
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 #fm-subtitle {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   font-weight: 400;
-  letter-spacing: 0.1px;
+}
+
+/* Masking-tape style Badge */
+.semester-badge {
+  font-family: var(--font-hand);
+  font-size: 12px;
+  background: #fef5d1;
+  color: #7b6935;
+  padding: 4px 14px;
+  border: 1px dashed rgba(123, 105, 53, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transform: rotate(-2deg);
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .fm-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+}
+
+.search-wrapper {
+  position: relative;
 }
 
 #fm-search {
-  height: 36px;
-  width: 210px;
-  padding: 0 14px;
-  font-size: 13px;
+  height: 42px;
+  width: 250px;
+  padding: 0 16px;
+  font-size: 13.5px;
+  font-family: var(--font-hand); /* handwritten search slip look */
   color: var(--ink);
-  background: var(--bg);
-  border: 1.5px solid var(--border-strong);
-  border-radius: 18px;
+  background: #fdfbf7; /* warm paper slip bg */
+  border: 1.5px dashed var(--muted); /* dashed border */
+  border-radius: 6px; /* rectangular search slip */
   outline: none;
   user-select: text;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: all 0.15s ease;
+  box-shadow: 2px 2px 6px rgba(55, 45, 30, 0.05);
 }
 
 #fm-search::placeholder {
@@ -118,142 +203,1133 @@ html, body {
 }
 
 #fm-search:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.12);
+  background: #fff;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 4px rgba(38, 63, 103, 0.12);
 }
 
 #new-notebook-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  height: 38px;
-  padding: 0 18px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 19px;
-  font-size: 13px;
-  font-weight: 600;
+  gap: 8px;
+  height: 42px;
+  padding: 0 20px;
+  background: #ffe58a; /* bright marker yellow */
+  color: #4b3d11; /* dark ink for yellow sticker */
+  border: 2px solid #4b3d11; /* thick border */
+  border-radius: 8px; /* sticker rect look */
+  font-family: var(--font-hand); /* handwritten sticker style */
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(74, 111, 165, 0.30);
-  letter-spacing: 0.1px;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 3px 3px 0px #4b3d11; /* blocky stamp shadow */
 }
 
 #new-notebook-btn:hover {
-  background: var(--accent-dark);
-  box-shadow: 0 4px 14px rgba(74, 111, 165, 0.38);
+  background: #ffd64f;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #4b3d11;
 }
 
 #new-notebook-btn:active {
-  transform: scale(0.97);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #4b3d11;
 }
 
 #new-notebook-btn img {
   width: 15px;
   height: 15px;
-  filter: invert(1);
+  filter: brightness(0) saturate(100%) invert(21%) sepia(21%) saturate(1613%) hue-rotate(12deg) brightness(91%) contrast(90%); /* make icon dark brown */
 }
 
-/* ─── Filter Tabs ──────────────────────────────────────────────────────────── */
+/* ─── Study Stats Strip (Rotated College Desk Items) ────────────────────────── */
+
+.study-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 24px 36px 12px;
+  perspective: 1000px;
+  flex-shrink: 0;
+}
+
+.desk-item {
+  position: relative;
+  width: 210px;
+  min-height: 85px;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: default;
+  border: 2px solid var(--border-strong);
+}
+
+.desk-item:hover {
+  transform: scale(1.05) translateY(-4px) rotate(0deg) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+}
+
+.desk-item-icon {
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.desk-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.desk-item-val {
+  font-family: var(--font-hand);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.desk-item-lbl {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tape strip effect on sticky notes / index cards */
+.tape-strip {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 75px;
+  height: 22px;
+  background: rgba(245, 240, 220, 0.65);
+  backdrop-filter: blur(1px);
+  border-left: 2px dashed rgba(0, 0, 0, 0.05);
+  border-right: 2px dashed rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Cute metallic paperclip */
+.paperclip-shape {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  width: 12px;
+  height: 32px;
+  border: 2px solid #a1a69d;
+  border-radius: 6px;
+  background: transparent;
+  pointer-events: none;
+  z-index: 10;
+  transform: rotate(15deg);
+}
+
+.paperclip-shape::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1.5px solid #bdc2b9;
+  border-radius: 4px;
+}
+
+/* Timetable card */
+.timetable-card {
+  background: #fdfcee; /* light pastel yellow */
+  border-color: #ebdcb2;
+  transform: rotate(-2.5deg);
+}
+
+.timetable-card .desk-item-val {
+  color: #8b7122;
+}
+
+/* Sticky Note (Recent notes) */
+.sticky-note {
+  background: #fbf0ee; /* light coral */
+  border-color: #f3d4cf;
+  transform: rotate(3deg);
+}
+
+.sticky-note .desk-item-val {
+  color: #c96253;
+}
+
+/* Index Card (Binder Books) */
+.index-card {
+  background: #edf3e7; /* light sage */
+  border-color: #dbe4d2;
+  transform: rotate(-1.5deg);
+}
+
+.index-card .desk-item-val {
+  color: #5b7040;
+}
+
+/* Paper Slip (Study Pages) */
+.paper-slip {
+  background: #eaf1f8; /* light blue */
+  border-color: #d4e0eb;
+  transform: rotate(1.5deg);
+}
+
+.paper-slip .desk-item-val {
+  color: #385d87;
+}
+
+/* ─── Binder Divider Index Tabs ───────────────────────────────────────────── */
+
+#fm-filters-wrapper {
+  padding: 0 54px;
+  margin-top: 28px;
+  border-bottom: none; /* Blends directly into desk mat border */
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+}
 
 #fm-filters {
   display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 0 36px;
-  height: 42px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  position: sticky;
-  top: 72px;
-  z-index: 19;
+  align-items: flex-end;
+  gap: 4px;
 }
 
 .filter-tab {
-  height: 100%;
-  padding: 0 16px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
+  height: 38px;
+  padding: 0 24px;
+  border: 2px solid var(--border-strong);
+  border-bottom: none;
+  border-radius: 10px 18px 0 0;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 700;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
   position: relative;
-  bottom: -1px; /* overlap parent border */
+  top: 2px;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
+/* Individual tab divider colors */
+.filter-tab[data-filter="all"] { background: var(--navy); }
+.filter-tab[data-filter="recent"] { background: var(--sage); }
+.filter-tab[data-filter="lined"] { background: var(--line-blue); }
+.filter-tab[data-filter="blank"] { background: var(--folder-tan); }
+
 .filter-tab:hover {
-  color: var(--ink);
+  transform: translateY(-2px);
+  z-index: 2;
 }
 
 .filter-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  font-weight: 600;
+  height: 44px;
+  padding-bottom: 6px;
+  z-index: 10;
+  top: 2px;
+  font-size: 14px;
+  border-bottom: 2px solid var(--paper); /* Blends into the paper edge of the desk mat */
+  box-shadow: 0 -4px 12px rgba(55, 45, 30, 0.15);
+  color: #fff !important;
 }
 
-/* ─── Notebook Grid ───────────────────────────────────────────────────────── */
+:root[data-theme="dark"] .filter-tab.active {
+  border-bottom: 2px solid var(--surface); /* Blends into dark desk mat */
+}
 
-#notebook-grid {
-  padding: 28px 36px 56px;
+/* ─── Immersive Desk Mat / Binder Tray Surface ────────────────────────────── */
+
+.desk-mat {
+  background: var(--paper); /* Classic cream desk pad */
+  border: 2px solid var(--border-strong);
+  border-radius: 20px;
+  margin: 0 36px 40px;
+  padding: 32px;
+  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.05), 0 12px 36px rgba(55, 45, 30, 0.08);
+  position: relative;
+  z-index: 2;
+  /* Dotted paper texture overlay inside the desk mat */
+  background-image: radial-gradient(rgba(55, 45, 30, 0.06) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.shelf-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 1.5px dashed var(--border-strong);
+  padding-bottom: 16px;
+  margin-bottom: 28px;
+}
+
+.shelf-header h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shelf-sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ─── Immersive Desk Mat / Binder Tray Surface ────────────────────────────── */
+
+.desk-mat {
+  background: var(--paper); /* Classic cream desk pad */
+  border: 10px solid #5a5043; /* Wooden desk tray lip border */
+  border-image: linear-gradient(135deg, #7c7468 0%, #5a5043 100%) 10;
+  border-radius: 20px;
+  margin: 0 36px 40px;
+  padding: 36px;
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.08), 0 16px 45px rgba(55, 45, 30, 0.12);
+  position: relative;
+  z-index: 2;
+  /* Ruled paper grid look */
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(55, 45, 30, 0.03) 27px, rgba(55, 45, 30, 0.03) 28px),
+    radial-gradient(rgba(55, 45, 30, 0.05) 1.5px, transparent 1.5px);
+  background-size: 100% 28px, 20px 20px;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shelf-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 2px dashed var(--border-strong);
+  padding-bottom: 16px;
+  margin-bottom: 28px;
+}
+
+.shelf-header h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shelf-sub {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: var(--font-main);
+}
+
+.notebook-shelf {
+  display: block; /* Sectioned dynamic layout takes over */
+}
+
+/* ─── Immersive Sections Layout ─── */
+.workspace-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.workspace-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+}
+
+.section-label-maker {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2px;
+  padding-left: 4px;
+  border-left: 4px solid var(--accent);
+  border-radius: 2px;
+}
+
+.section-label-maker h3 {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label-maker .label-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+/* Active Desk Pad Section */
+/* Immersive Active Study Desk Surface */
+.active-study-desk {
+  background: #fcf8f0; /* Classic warm college desk tray surface */
+  border: 10px solid #5a5043; /* Rich wooden tray lip border */
+  border-image: linear-gradient(135deg, #7c7468 0%, #5a5043 100%) 10;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.08), 0 16px 45px rgba(55, 45, 30, 0.12);
+  position: relative;
+  z-index: 2;
+  margin-bottom: 40px;
+  /* Ruled paper texture overlay inside the desk mat */
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(55, 45, 30, 0.03) 27px, rgba(55, 45, 30, 0.03) 28px),
+    radial-gradient(rgba(55, 45, 30, 0.05) 1.5px, transparent 1.5px);
+  background-size: 100% 28px, 20px 20px;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Pinned Header Label inside the Desk Surface */
+.desk-header-label {
+  position: absolute;
+  top: -15px;
+  left: 36px;
+  background: #fbf9f2;
+  border: 2px solid #5a5043;
+  padding: 10px 24px;
+  border-radius: 4px;
+  box-shadow: 2px 6px 15px rgba(55, 45, 30, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 5;
+  transform: rotate(-1deg);
+}
+
+.desk-tape-pin {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(3deg);
+  width: 60px;
+  height: 16px;
+  background: rgba(218, 206, 172, 0.55);
+  backdrop-filter: blur(1px);
+  border-left: 2px dashed rgba(0, 0, 0, 0.03);
+  border-right: 2px dashed rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.desk-header-text h3 {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.desk-header-text .label-subtitle {
+  font-size: 9.5px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* 3-Column Desk Zones Layout */
+.desk-zones {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 28px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.desk-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.desk-zone-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1.5px dashed var(--border-strong);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+/* Zone 1: Recent Notebook */
+.recent-notebook-zone {
+  position: relative;
+}
+
+.recent-notebook-wrapper {
+  position: relative;
+  padding: 16px;
+  background: rgba(55, 45, 30, 0.02);
+  border-radius: 12px;
+  border: 1.5px dashed rgba(55, 45, 30, 0.1);
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desk-notebook-mat {
+  position: absolute;
+  inset: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+  pointer-events: none;
+}
+
+.no-recent-book {
+  font-family: var(--font-hand);
+  font-size: 15px;
+  color: var(--muted);
+  text-align: center;
+  padding: 20px;
+  line-height: 1.4;
+}
+
+.active-notebooks-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 36px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+/* Zone 2: Loose Notes Zone */
+.loose-notes-zone {
+  position: relative;
+}
+
+.loose-paper-stack {
+  position: relative;
+  width: 100%;
+  height: 350px;
+}
+
+.loose-sheet {
+  position: absolute;
+  background: #ffffff;
+  border: 1.5px solid var(--border-strong);
+  box-shadow: 2px 6px 15px rgba(55, 45, 30, 0.07);
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.sheet-blank {
+  width: 90%;
+  height: 230px;
+  left: 5%;
+  top: 15px;
+  transform: rotate(-4deg);
+  background-color: #faf8f5;
+  opacity: 0.95;
+}
+
+.sheet-blank .sheet-title {
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: #8c8275;
+  margin-bottom: 8px;
+}
+
+.sheet-doodle-path {
+  flex: 1;
+  border: 1px dashed rgba(55, 45, 30, 0.08);
+  border-radius: 4px;
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 30% 40%, transparent 10px, rgba(55, 45, 30, 0.03) 11px, transparent 12px),
+    radial-gradient(circle at 70% 60%, transparent 14px, rgba(55, 45, 30, 0.03) 15px, transparent 16px);
+}
+
+.sheet-lined {
+  width: 92%;
+  height: 250px;
+  left: 8%;
+  top: 40px;
+  transform: rotate(3deg);
+  z-index: 3;
+  /* Lined sheet background */
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent 0, transparent 16px, rgba(191, 208, 220, 0.6) 16px, rgba(191, 208, 220, 0.6) 17px),
+    linear-gradient(to right, transparent 28px, rgba(226, 170, 162, 0.8) 28px, rgba(226, 170, 162, 0.8) 29px, transparent 29px);
+  background-position: 0 16px, 0 0;
+  background-color: #ffffff;
+}
+
+.sheet-lined .sheet-title {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 24px;
+  padding-left: 20px;
+}
+
+.sheet-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  padding-left: 20px;
+  margin-top: -6px;
+}
+
+.sheet-line {
+  font-family: var(--font-hand);
+  font-size: 12px;
+  color: #3b4252;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Quick checklist taped index card */
+.study-checklist-card {
+  position: absolute;
+  width: 82%;
+  height: 145px;
+  left: 4%;
+  bottom: 10px;
+  background: #fbf9f4;
+  border: 1.5px solid #ebdcb2;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 3px 8px 18px rgba(55, 45, 30, 0.08);
+  z-index: 4;
+  transform: rotate(-2deg);
+}
+
+.study-checklist-card .desk-tape {
+  width: 44px;
+  height: 12px;
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  background: rgba(218, 206, 172, 0.45);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.study-checklist-card .checklist-title {
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #705809;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(112, 88, 9, 0.15);
+  padding-bottom: 4px;
+}
+
+.checklist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hand);
+  font-size: 12px;
+  color: #4c566a;
+  cursor: default;
+}
+
+.chk-item input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  accent-color: #d1b447;
+  cursor: default;
+}
+
+.chk-item input[type="checkbox"]:checked + span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Zone 3: Pinned Reminders Zone */
+.pinned-reminders-zone {
+  position: relative;
+}
+
+.reminders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 350px;
+  justify-content: space-between;
+}
+
+/* Sticky notes */
+.sticky-reminder {
+  position: relative;
+  padding: 12px;
+  border-radius: 2px;
+  box-shadow: 2px 5px 12px rgba(55, 45, 30, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+}
+
+.sticky-reminder.color-yellow {
+  background: #fef8dd;
+  border: 1px solid #ebdcb2;
+  transform: rotate(3deg);
+  align-self: flex-start;
+  width: 90%;
+}
+
+.sticky-reminder.color-orange {
+  background: #ffeeda;
+  border: 1px solid #f2dbca;
+  transform: rotate(-3deg);
+  align-self: flex-end;
+  width: 92%;
+}
+
+.sticky-reminder .sticky-text {
+  font-family: var(--font-hand);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.sticky-reminder.color-yellow .sticky-text {
+  color: #7a6523;
+}
+
+.sticky-reminder.color-orange .sticky-text {
+  color: #8c572b;
+}
+
+.sticky-reminder .desk-tape {
+  width: 48px;
+  height: 12px;
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  background: rgba(245, 240, 220, 0.7);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+/* Subject Folder Stack */
+.subject-folder-stack {
+  position: relative;
+  background: #eedcb3; /* Manila folder color */
+  border: 1.5px solid #d4c194;
+  border-radius: 4px 16px 4px 4px;
+  height: 110px;
+  width: 96%;
+  box-shadow: 3px 6px 14px rgba(55, 45, 30, 0.09);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transform: rotate(1deg);
+}
+
+.folder-tab-peeking {
+  position: absolute;
+  top: -18px;
+  left: 12px;
+  height: 18px;
+  background: #eedcb3;
+  border: 1.5px solid #d4c194;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 2px 10px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #7c6c45;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.folder-body-peek {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1.5px dashed rgba(124, 108, 69, 0.25);
+  padding-top: 8px;
+}
+
+.folder-line {
+  font-family: var(--font-hand);
+  font-size: 11.5px;
+  color: #7c6c45;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.folder-line::before {
+  content: '📁';
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.workspace-divider-line {
+  height: 2px;
+  border-bottom: 2px dashed var(--border-strong);
+  margin: 8px 0;
+}
+
+.workspace-library-container {
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+  gap: 40px;
+}
+
+.binders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 28px;
+}
+
+.sketches-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 24px;
-  align-content: start;
+  gap: 28px;
 }
 
-/* ─── Notebook Cards ──────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .workspace-library-container {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* Decorative Desk Ornaments */
+.desk-ornament {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* Coffee Stain ring */
+.coffee-stain {
+  width: 100px;
+  height: 100px;
+  border: 4px solid rgba(139, 90, 43, 0.05);
+  border-radius: 50%;
+  bottom: 15px;
+  left: 25px;
+}
+
+.coffee-stain::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1.5px dashed rgba(139, 90, 43, 0.02);
+  border-radius: 50%;
+}
+
+/* Silver paperclip */
+.desk-paperclip {
+  width: 10px;
+  height: 26px;
+  border: 2px solid #a8ada3;
+  border-radius: 5px;
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  transform: rotate(-12deg);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.06);
+  z-index: 10;
+}
+
+.desk-paperclip::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border: 1.5px solid #bdc2b9;
+  border-radius: 3px;
+}
+
+/* Hexagonal Graphite Pencil */
+.desk-pencil {
+  position: absolute;
+  width: 130px;
+  height: 7px;
+  background: linear-gradient(to bottom, #ffd147 0%, #db9a1a 100%);
+  border: 1.5px solid rgba(55, 45, 30, 0.4);
+  border-radius: 2px;
+  bottom: 24px;
+  left: 45%;
+  transform: rotate(6deg);
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.12);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.desk-pencil::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: -1px;
+  width: 0;
+  height: 0;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  border-right: 12px solid #e2c09c;
+}
+
+.desk-pencil::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 1.5px;
+  width: 0;
+  height: 0;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  border-right: 4px solid #202b38;
+}
+
+/* ─── Physical Notebook Covers (Upgraded) ───────────────────────────────── */
 
 .notebook-card {
-  background: var(--surface-elevated);
-  border-radius: 18px;
-  box-shadow: var(--shadow-card);
+  position: relative;
+  width: 100%;
+  height: 330px;
+  border-radius: 16px 24px 24px 16px; /* physical rounded cover corners */
+  box-shadow: 5px 8px 20px rgba(55, 45, 30, 0.16);
   cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: visible; /* folder tabs stick out */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  padding: 16px 16px 16px 30px; /* spine & rings spacing */
+  background: #263f67;
 }
+
+.notebook-card::before {
+  /* Spine Crease Line */
+  content: '';
+  position: absolute;
+  left: 26px;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 1px 0 2px rgba(255, 255, 255, 0.12);
+  z-index: 4;
+}
+
+/* Cover Pattern Overlay */
+.notebook-cover-pattern {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px 22px 22px 14px;
+  pointer-events: none;
+  opacity: 0.16;
+  z-index: 1;
+}
+
+/* Grid patterns */
+.notebook-card.subject-computer-science .notebook-cover-pattern,
+.notebook-card.subject-maths .notebook-cover-pattern {
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+.notebook-card.subject-physics .notebook-cover-pattern {
+  background-image: 
+    radial-gradient(circle, rgba(255, 255, 255, 0.4) 2.5px, transparent 2.5px),
+    radial-gradient(circle, transparent 10px, rgba(255, 255, 255, 0.3) 11px, transparent 12px);
+  background-size: 26px 26px;
+}
+
+.notebook-card.subject-sketches .notebook-cover-pattern {
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 12px, rgba(255, 255, 255, 0.4) 12px, rgba(255, 255, 255, 0.4) 13.5px);
+}
+
+/* Custom Spine */
+.notebook-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 14px 0 0 14px;
+  border-right: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.22);
+  z-index: 3;
+}
+
+/* Spine Highlight Bands */
+.notebook-card.cover-navy { background-color: var(--navy); }
+.notebook-card.cover-sage { background-color: var(--sage); }
+.notebook-card.cover-tan { background-color: var(--folder-tan); }
+.notebook-card.cover-coral { background-color: var(--coral); }
+.notebook-card.cover-blue { background-color: var(--line-blue); }
+
+.notebook-card.cover-navy .notebook-spine { background: #13243d; }
+.notebook-card.cover-sage .notebook-spine { background: #4f603a; }
+.notebook-card.cover-tan .notebook-spine { background: #6b512c; }
+.notebook-card.cover-coral .notebook-spine { background: #8c3b31; }
+.notebook-card.cover-blue .notebook-spine { background: #1c324b; }
+
+/* Metallic Ring Loops (spiral bindings) */
+.notebook-rings {
+  position: absolute;
+  left: 10px;
+  top: 24px;
+  bottom: 24px;
+  width: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ring-loop {
+  width: 22px;
+  height: 9px;
+  background: linear-gradient(to bottom, #ffffff 0%, #d5d9cf 30%, #858880 70%, #4f524b 100%);
+  border: 1px solid #434540;
+  border-radius: 5px;
+  box-shadow: 2px 3px 5px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.ring-loop::before {
+  /* punched ring holes on cover */
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 2px;
+  width: 4px;
+  height: 5px;
+  background: #111;
+  border-radius: 50%;
+}
+
+/* Subject Tabs sticking out */
+.notebook-subject-tab {
+  position: absolute;
+  right: -10px;
+  top: 36px;
+  background: #bfd0dc;
+  color: #1f2937;
+  padding: 5px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 3px 3px 6px rgba(0,0,0,0.18);
+  z-index: -1;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: left center;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-left: none;
+}
+
+.notebook-card.subject-computer-science .notebook-subject-tab { background: var(--navy); color: #fff; }
+.notebook-card.subject-maths .notebook-subject-tab { background: var(--sage); color: #fff; }
+.notebook-card.subject-physics .notebook-subject-tab { background: var(--coral); color: #fff; }
+.notebook-card.subject-sketches .notebook-subject-tab { background: var(--folder-tan); color: #fff; }
+.notebook-card.subject-other .notebook-subject-tab { background: var(--muted); color: #fff; }
 
 .notebook-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-8px) rotate(1deg) scale(1.025);
+  box-shadow: 10px 16px 36px rgba(55, 45, 30, 0.24);
+  z-index: 5;
 }
 
-/* ── Card preview — visual representation of page mode ── */
+.notebook-card:hover .notebook-subject-tab {
+  transform: translateX(6px);
+}
 
-.card-preview {
-  height: 148px;
+/* Embedded page preview recess */
+.notebook-card .card-preview {
+  margin: 0;
+  height: 110px;
   position: relative;
   overflow: hidden;
-  border-radius: 18px 18px 0 0;
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.3);
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.22), inset -2px -2px 4px rgba(255,255,255,0.08);
+  background: var(--paper);
+  z-index: 2;
 }
 
 .card-preview.blank {
-  background: #fdf9f0;
+  background: var(--paper);
 }
 
 .card-preview.lined {
-  background: #fdf9f0;
+  background: var(--paper);
   background-image:
     repeating-linear-gradient(
       to bottom,
       transparent 0px,
-      transparent 26px,
-      rgba(148, 183, 210, 0.55) 26px,
-      rgba(148, 183, 210, 0.55) 27px
+      transparent 15px,
+      rgba(191, 208, 220, 0.7) 15px,
+      rgba(191, 208, 220, 0.7) 16px
     ),
     linear-gradient(
       to right,
-      transparent 34px,
-      rgba(200, 128, 128, 0.45) 34px,
-      rgba(200, 128, 128, 0.45) 35px,
-      transparent 35px
+      transparent 22px,
+      rgba(226, 170, 162, 0.7) 22px,
+      rgba(226, 170, 162, 0.7) 23px,
+      transparent 23px
     );
-  background-position: 0 28px, 0 0;
+  background-position: 0 18px, 0 0;
 }
 
 .card-thumbnail {
@@ -262,78 +1338,247 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.88;
+  opacity: 0.95;
+  z-index: 2;
 }
 
-/* ── Card body ── */
-
-.card-info {
-  padding: 14px 16px 12px;
+/* Double bordered paper sticker label */
+.notebook-label-sticker {
+  background: #fcfaf5;
+  border: 2px solid #554a3a;
+  padding: 10px 12px;
+  border-radius: 6px;
+  position: relative;
+  z-index: 3;
+  margin-top: 14px;
+  box-shadow: inset 0 0 0 2px #fff, 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
+.notebook-label-sticker::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border: 1px solid #cfc5b4;
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.notebook-label-sticker .card-tag {
+  font-family: var(--font-hand);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.notebook-label-sticker .card-title {
+  font-family: var(--font-main);
+  font-size: 14.5px;
+  font-weight: 750;
+  color: #212529;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 5px;
+  border-bottom: 1px dashed rgba(55, 45, 30, 0.22);
+  padding-bottom: 2px;
+}
+
+.notebook-label-sticker .card-subject-chip {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.sub-computer-science { background: var(--navy); }
+.sub-maths { background: var(--sage); }
+.sub-physics { background: var(--coral); }
+.sub-sketches { background: var(--folder-tan); }
+.sub-other { background: var(--muted); }
+
+/* Card footer metadata sticker */
+.notebook-card .card-info {
+  margin-top: auto;
+  margin-bottom: 0;
+  z-index: 3;
+  background: #f9f5eb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  border: 1.5px dashed var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+  opacity: 0.95;
+  transition: all 0.2s ease;
+  color: #2e302d;
+}
+
+.notebook-card:hover .card-info {
+  opacity: 1;
 }
 
 .card-meta {
-  font-size: 11px;
-  color: var(--muted);
   display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .page-mode-badge {
-  background: #eee9df;
-  color: #888;
-  border-radius: 5px;
-  padding: 2px 7px;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
+  background: var(--paper-deep);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-size: 8.5px;
+  font-weight: 800;
+  width: fit-content;
+  text-transform: uppercase;
 }
 
+.card-date {
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Card Actions hover pop stickers in top right */
 .card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   display: flex;
-  gap: 4px;
-  margin-top: 9px;
+  gap: 6px;
   opacity: 0;
-  transition: opacity 0.15s;
+  transform: translateY(-5px) scale(0.9);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 15;
 }
 
 .notebook-card:hover .card-actions {
   opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .card-action-btn {
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 7px;
-  background: #f0ece4;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid #5a5043;
+  border-radius: 50%;
+  background: #fcf9f2;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5px;
-  transition: background 0.12s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+  transition: all 0.15s ease;
 }
 
 .card-action-btn:hover {
-  background: #e3dfd7;
+  background: var(--highlight);
+  transform: scale(1.2) rotate(8deg);
 }
 
 .card-action-btn img {
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
 }
+
+/* ─── Notebook Placeholder Card ────────────────────────────────────────── */
+
+.notebook-placeholder-card {
+  position: relative;
+  width: 100%;
+  height: 330px; /* same height as notebook-card to align perfectly */
+  border-radius: 16px 24px 24px 16px;
+  border: 3.5px dashed var(--border-strong);
+  background: rgba(55, 45, 30, 0.02);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 16px 16px 30px;
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
+}
+
+.notebook-placeholder-card .placeholder-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px 0 0 14px;
+  border-right: 2px dashed var(--border-strong);
+}
+
+.notebook-placeholder-card .placeholder-rings {
+  position: absolute;
+  left: 10px;
+  top: 24px;
+  bottom: 24px;
+  width: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0.35;
+}
+
+.notebook-placeholder-card .placeholder-dashed-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.notebook-placeholder-card .placeholder-plus {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all 0.25s ease;
+}
+
+.notebook-placeholder-card .placeholder-label {
+  font-family: var(--font-hand);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* Hover highlights for placeholders */
+.notebook-placeholder-card:hover {
+  border-color: var(--navy);
+  background: rgba(38, 63, 103, 0.03);
+  transform: translateY(-6px) rotate(0.5deg);
+  box-shadow: 0 10px 24px rgba(55, 45, 30, 0.08);
+}
+
+.notebook-placeholder-card:hover .placeholder-plus {
+  color: var(--navy);
+  transform: scale(1.2);
+}
+
+.notebook-placeholder-card:hover .placeholder-label {
+  color: var(--navy);
+}
+
+/* Subject theme outlines for placeholders */
+.notebook-placeholder-card.cover-navy:hover { border-color: var(--navy); }
+.notebook-placeholder-card.cover-sage:hover { border-color: var(--sage); }
+.notebook-placeholder-card.cover-coral:hover { border-color: var(--coral); }
+.notebook-placeholder-card.cover-tan:hover { border-color: var(--folder-tan); }
 
 /* ─── Empty State ─────────────────────────────────────────────────────────── */
 
@@ -343,97 +1588,124 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 20px 80px;
+  padding: 56px 24px;
   text-align: center;
 }
 
-/* Decorative notebook cover illustration, pure CSS */
-.empty-preview {
-  width: 100px;
-  height: 136px;
-  border-radius: 10px;
-  margin-bottom: 28px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.08);
-  /* background set by .blank / .lined classes shared with card-preview */
+/* Illustrated Stack of Notebooks */
+.empty-shelf-stack {
+  position: relative;
+  width: 140px;
+  height: 90px;
+  margin-bottom: 24px;
 }
 
-.empty-preview.blank {
-  background: #fdf9f0;
+.shelf-notebook {
+  position: absolute;
+  width: 120px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.empty-preview.lined {
-  background: #fdf9f0;
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 16px,
-      rgba(148, 183, 210, 0.55) 16px,
-      rgba(148, 183, 210, 0.55) 17px
-    ),
-    linear-gradient(
-      to right,
-      transparent 20px,
-      rgba(200, 128, 128, 0.4) 20px,
-      rgba(200, 128, 128, 0.4) 21px,
-      transparent 21px
-    );
-  background-position: 0 18px, 0 0;
+.shelf-spine {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: rgba(0,0,0,0.15);
+}
+
+.shelf-label {
+  font-family: var(--font-hand);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.notebook-1 {
+  background: var(--navy);
+  bottom: 0;
+  left: 0;
+  transform: rotate(-1deg);
+  z-index: 3;
+}
+
+.notebook-2 {
+  background: var(--sage);
+  bottom: 14px;
+  left: 12px;
+  transform: rotate(2deg);
+  z-index: 2;
+}
+
+.notebook-3 {
+  background: var(--coral);
+  bottom: 28px;
+  left: 6px;
+  transform: rotate(-2deg);
+  z-index: 1;
 }
 
 .empty-title {
-  font-size: 22px;
+  font-family: var(--font-serif);
+  font-size: 24px;
   font-weight: 700;
-  color: var(--ink);
-  opacity: 0.35;
-  margin-bottom: 8px;
+  color: var(--navy);
+  margin-bottom: 10px;
 }
 
 .empty-sub {
   font-size: 14px;
   color: var(--muted);
-  margin-bottom: 24px;
-  max-width: 280px;
+  margin-bottom: 26px;
+  max-width: 320px;
 }
 
 .empty-create-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 42px;
-  padding: 0 22px;
-  background: var(--accent);
+  gap: 8px;
+  height: 44px;
+  padding: 0 24px;
+  background: var(--navy);
   color: #fff;
   border: none;
-  border-radius: 21px;
+  border-radius: 22px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s;
-  box-shadow: 0 3px 10px rgba(74, 111, 165, 0.32);
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 12px rgba(38, 63, 103, 0.25);
 }
 
 .empty-create-btn:hover {
   background: var(--accent-dark);
+  transform: translateY(-2px);
 }
 
 .empty-hint {
   font-size: 12px;
   color: var(--muted);
-  margin-top: 12px;
-  opacity: 0.75;
+  margin-top: 14px;
+  opacity: 0.8;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    NEW NOTEBOOK MODAL
-═══════════════════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 10, 20, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(38, 63, 103, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -441,24 +1713,25 @@ html, body {
 }
 
 .modal-box {
-  background: var(--surface-elevated);
+  background: #ffffff;
   border-radius: var(--radius-xl);
-  padding: 36px 40px 32px;
-  width: 420px;
+  padding: 36px 40px;
+  width: 450px;
   max-width: 92vw;
   box-shadow: var(--shadow-modal);
+  border: 3px solid var(--border-strong);
 }
 
 .modal-box h2 {
-  font-size: 20px;
+  font-family: var(--font-serif);
+  font-size: 24px;
   font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 4px;
-  letter-spacing: -0.3px;
+  color: var(--navy);
+  margin-bottom: 6px;
 }
 
 .modal-desc {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--muted);
   margin-bottom: 24px;
 }
@@ -466,12 +1739,12 @@ html, body {
 .modal-box > label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 700;
+  color: var(--navy);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 7px;
-  margin-top: 20px;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+  margin-top: 22px;
 }
 
 .modal-box > label:first-of-type {
@@ -480,27 +1753,62 @@ html, body {
 
 .modal-box input[type="text"] {
   width: 100%;
-  height: 46px;
-  padding: 0 15px;
+  height: 48px;
+  padding: 0 16px;
   font-size: 15px;
-  border: 1.5px solid var(--border-strong);
+  font-family: var(--font-main);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius-lg);
   outline: none;
   color: var(--ink);
-  background: var(--surface);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fbf9f4;
+  transition: all 0.15s ease;
   user-select: text;
 }
 
 .modal-box input[type="text"]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.12);
+  background: #fff;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 4px rgba(38, 63, 103, 0.12);
 }
 
-/* Large page-style cards in the modal */
+/* Preset Category Chips */
+.subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sub-chip {
+  border: 1.5px solid var(--border-strong);
+  background: #fbf9f4;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: var(--font-main);
+}
+
+.sub-chip:hover {
+  background: #f0ece4;
+  color: var(--ink);
+}
+
+.sub-chip.active {
+  background: var(--highlight);
+  border-color: #d1b447;
+  color: #705809;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+}
+
+/* Large Paper Style Selectors */
 .page-style-options {
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .style-card {
@@ -509,110 +1817,156 @@ html, body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 14px 12px 12px;
+  padding: 14px;
   border: 2px solid var(--border-strong);
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: all 0.15s;
   position: relative;
+  background: #fbf9f4;
 }
 
 .style-card input[type="radio"] {
   position: absolute;
   opacity: 0;
-  width: 0;
-  height: 0;
   pointer-events: none;
 }
 
-/* Paper style preview inside the modal card */
 .style-preview {
   width: 100%;
-  height: 80px;
+  height: 70px;
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .style-preview.blank {
-  background: #fdf9f0;
-  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--paper);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 
 .style-preview.lined {
-  background: #fdf9f0;
-  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--paper);
+  border: 1px solid rgba(0,0,0,0.08);
   background-image:
     repeating-linear-gradient(
       to bottom,
       transparent 0px,
-      transparent 15px,
-      rgba(148, 183, 210, 0.6) 15px,
-      rgba(148, 183, 210, 0.6) 16px
+      transparent 14px,
+      rgba(191, 208, 220, 0.7) 14px,
+      rgba(191, 208, 220, 0.7) 15px
     ),
     linear-gradient(
       to right,
-      transparent 22px,
-      rgba(200, 128, 128, 0.45) 22px,
-      rgba(200, 128, 128, 0.45) 23px,
-      transparent 23px
+      transparent 20px,
+      rgba(226, 170, 162, 0.7) 20px,
+      rgba(226, 170, 162, 0.7) 21px,
+      transparent 21px
     );
-  background-position: 0 16px, 0 0;
+  background-position: 0 15px, 0 0;
 }
 
 .style-card span {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
-  transition: color 0.15s;
 }
 
-/* Selected state via :has() — already wired in existing CSS pattern */
 .style-card:has(input:checked) {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--navy);
+  background: var(--navy-soft);
 }
 
 .style-card:has(input:checked) span {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--navy);
 }
 
-.style-card:hover:not(:has(input:checked)) {
-  border-color: var(--border-strong);
-  background: #f5f2ec;
+/* Cover Theme Colors Selectors */
+.cover-color-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.color-dot {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--border-strong);
+  transition: transform 0.12s, box-shadow 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-dot input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.color-dot:hover {
+  transform: scale(1.1);
+}
+
+.color-dot.active {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(38, 63, 103, 0.25);
+  border-color: #fff;
+}
+
+.color-dot.navy { background-color: var(--navy); }
+.color-dot.sage { background-color: var(--sage); }
+.color-dot.tan { background-color: var(--folder-tan); }
+.color-dot.coral { background-color: var(--coral); }
+.color-dot.blue { background-color: var(--line-blue); }
+
+.color-dot .dot-check {
+  display: none;
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+.color-dot.active .dot-check {
+  display: block;
 }
 
 /* Modal action buttons */
 .modal-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 28px;
+  gap: 12px;
+  margin-top: 32px;
   justify-content: flex-end;
 }
 
 .modal-actions button {
-  height: 40px;
-  padding: 0 22px;
+  height: 44px;
+  padding: 0 24px;
   border-radius: var(--radius-lg);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  border: 1.5px solid var(--border-strong);
-  background: var(--bg);
+  border: 2px solid var(--border-strong);
+  background: #fbf9f4;
   color: var(--muted);
-  transition: background 0.12s, color 0.12s;
+  transition: all 0.12s;
+  font-family: var(--font-main);
 }
 
 .modal-actions button:hover {
-  background: #e8e4da;
+  background: #eae3d2;
   color: var(--ink);
 }
 
 .btn-primary {
-  background: var(--accent) !important;
+  background: var(--navy) !important;
   color: #fff !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 2px 8px rgba(74, 111, 165, 0.28);
+  border-color: var(--navy) !important;
+  box-shadow: 0 4px 10px rgba(38, 63, 103, 0.25);
 }
 
 .btn-primary:hover {
@@ -621,8 +1975,8 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   EDITOR
-═══════════════════════════════════════════════════════════════════════════ */
+   EDITOR SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 #editor-view {
   position: fixed;
@@ -630,125 +1984,196 @@ html, body {
   z-index: 100;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: var(--bg-desk);
 }
 
 /* ─── Editor Header ───────────────────────────────────────────────────────── */
 
 #editor-header {
-  height: 58px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  height: 76px;
+  background: #fdfbf7;
+  border-bottom: 2px solid var(--border-strong);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 20px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px;
   flex-shrink: 0;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 4px 20px rgba(55, 45, 30, 0.04);
   z-index: 10;
 }
 
+/* Tactile Manila tag back button */
 #editor-back-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 9px;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
+  position: relative;
+  width: auto;
+  height: 38px;
+  background: #eedcb3; /* Manila tag beige */
+  color: #7c6c45;
+  border: 2px solid #d4c194;
+  border-radius: 4px 16px 16px 4px; /*slanted shipping tag cut */
+  font-family: var(--font-hand);
+  font-size: 13.5px;
+  font-weight: 800;
+  padding: 0 16px 0 26px; /* Space for left grommet */
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 8px;
-  transition: background 0.12s;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 2px 4px 8px rgba(55, 45, 30, 0.08);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
   flex-shrink: 0;
 }
 
+#editor-back-btn::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  background: #fdfbf7; /* Grommet hole */
+  border: 2px solid #bda87a;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
 #editor-back-btn:hover {
-  background: #eae6dd;
+  background: #eed59e;
+  border-color: #c9b485;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 3px 6px 12px rgba(55, 45, 30, 0.12);
 }
 
 #editor-back-btn img {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
+}
+
+#editor-title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  margin-left: 8px;
 }
 
 #editor-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
 }
 
-/* Right side of editor header: controls + save */
+/* Stamped label-maker subject sticker */
+.subject-badge {
+  font-family: var(--font-hand);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2.5px 10px;
+  border-radius: 4px;
+  background: #fbf9f4;
+  border: 1.5px solid #ebdcb2;
+  color: #705809;
+  box-shadow: 2px 4px 8px rgba(55, 45, 30, 0.05);
+  transform: rotate(-1.5deg);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+/* Right side header actions */
 .editor-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   flex-shrink: 0;
 }
 
 .ctrl-label {
   font-size: 11px;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
   user-select: none;
 }
 
+/* Circular Ink Well color picker */
 #editor-header input[type="color"] {
   width: 32px;
-  height: 28px;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 7px;
+  height: 32px;
+  border: 3px solid #bda87a; /* Brass collar */
+  border-radius: 50%;
   cursor: pointer;
-  padding: 2px;
-  background: var(--surface-elevated);
+  padding: 0;
+  background: #ffffff;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
+#editor-header input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+#editor-header input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+/* Ruler / Thickness Gauge slider */
 #editor-header input[type="range"] {
-  width: 88px;
-  height: 4px;
-  accent-color: var(--accent);
+  width: 110px;
+  height: 6px;
+  accent-color: var(--navy);
   cursor: pointer;
+  background: #eae3d2;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 #sizeLabel {
-  font-size: 11px;
-  color: var(--muted);
-  min-width: 28px;
+  font-family: var(--font-hand);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  min-width: 34px;
 }
 
 /* Save button in header */
 .header-save-btn {
   display: inline-flex !important;
   align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 14px !important;
-  background: var(--accent) !important;
+  gap: 8px;
+  height: 38px;
+  padding: 0 18px !important;
+  background: var(--navy) !important;
   color: #fff !important;
   border: none !important;
-  border-radius: 17px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  border-radius: 19px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(74, 111, 165, 0.28);
-  transition: background 0.15s !important;
+  box-shadow: 0 4px 10px rgba(38, 63, 103, 0.25);
+  transition: all 0.15s ease !important;
   width: auto !important;
-  height: 34px !important;
 }
 
 .header-save-btn:hover {
   background: var(--accent-dark) !important;
+  transform: translateY(-1.5px);
 }
 
 .header-save-btn img {
-  width: 16px !important;
-  height: 16px !important;
+  width: 15px !important;
+  height: 15px !important;
   filter: invert(1);
 }
 
@@ -762,96 +2187,211 @@ html, body {
   min-height: 0;
 }
 
-/* ─── Horizontal Toolbar Dock ─────────────────────────────────────────────── */
+/* ─── Floating Pencil-Case Toolbar Dock ───────────────────────────────────── */
 
 #editor-toolbar {
-  height: 54px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  position: relative;
+  width: fit-content;
+  max-width: 90%;
+  height: 56px;
+  margin: 16px auto 10px auto; /* Centered wooden supply box sitting on the desk */
+  background: #f1ebd8; /* felt tray lining */
+  border: 3px solid #bbaea0; /* polished wooden border lips */
+  border-radius: 28px;
+  box-shadow: 
+    inset 0 3px 6px rgba(55, 45, 30, 0.08), 
+    0 8px 24px rgba(55, 45, 30, 0.12);
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding: 7px 20px;
-  gap: 3px;
+  padding: 0 24px;
+  gap: 14px;
   flex-shrink: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
+  z-index: 15;
 }
 
-#editor-toolbar::-webkit-scrollbar {
-  display: none;
+.toolbar-section-lbl {
+  font-family: var(--font-hand);
+  font-size: 11px;
+  font-weight: 700;
+  color: #8c7d6b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-right: 4px;
+  white-space: nowrap;
 }
 
-/* ─── Toolbar Buttons ─────────────────────────────────────────────────────── */
+.tool-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ─── Pencil-Case Slots (Toolbar Buttons) ─────────────────────────────────── */
 
 .tool-btn,
 .page-btn,
 .action-btn {
-  width: 38px;
-  height: 38px;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  background: transparent;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(55, 45, 30, 0.1);
+  border-radius: 50%; /* Rounded pencils/caps */
+  background: #faf8f5;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px;
-  transition: background 0.12s, border-color 0.12s;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(55, 45, 30, 0.04);
 }
 
 .tool-btn:hover,
-.page-btn:hover {
-  background: #ece8e0;
-}
-
+.page-btn:hover,
 .action-btn:hover {
-  background: #ece8e0;
+  background: #ffffff;
+  transform: translateY(-3px) scale(1.05); /* pick tool up */
+  box-shadow: 0 5px 10px rgba(55, 45, 30, 0.1);
+  border-color: rgba(55, 45, 30, 0.2);
 }
 
-.tool-btn.active,
+/* Tool slot accents */
+.tool-btn.active[data-tool="pen"] {
+  border-color: var(--navy);
+  border-width: 2.5px;
+  background: #e1e7f0;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(74, 111, 165, 0.25);
+}
+.tool-btn.active[data-tool="highlighter"] {
+  border-color: #d1b447;
+  border-width: 2.5px;
+  background: #fef4cd;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(209, 180, 71, 0.3);
+}
+.tool-btn.active[data-tool="eraser"] {
+  border-color: #c96253;
+  border-width: 2.5px;
+  background: var(--coral-soft);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(201, 98, 83, 0.3);
+}
+.tool-btn.active[data-tool="line"],
+.tool-btn.active[data-tool="spray"] {
+  border-color: #3b5f88;
+  border-width: 2.5px;
+  background: var(--blue-soft);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(59, 95, 136, 0.25);
+}
+
+/* CSS mini paper sheets for Page Styles */
+.page-btn {
+  border-radius: 4px !important; /* Miniature notebook pages */
+  width: 30px;
+  height: 36px;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.page-btn[data-page="blank"] {
+  background: #faf8f5;
+  border: 1.5px solid var(--border-strong);
+}
+
+.page-btn[data-page="lined"] {
+  background: #faf8f5;
+  border: 1.5px solid var(--border-strong);
+  /* Mini horizontal ruled lines */
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 4px, #bfd0dc 4px, #bfd0dc 5px);
+  background-size: 100% 5px;
+}
+
 .page-btn.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--navy);
+  background: var(--navy-soft);
 }
 
 .tool-btn img,
 .page-btn img,
 .action-btn img {
-  width: 21px;
-  height: 21px;
+  width: 20px;
+  height: 20px;
   pointer-events: none;
 }
 
-/* Vertical divider between toolbar groups */
+/* Supply-looking divider */
 .toolbar-divider {
-  width: 1px;
-  height: 26px;
+  width: 2px;
+  height: 28px;
   background: var(--border-strong);
-  margin: 0 7px;
+  margin: 0 10px;
   flex-shrink: 0;
 }
 
-/* ─── Canvas Workspace (the "desk" around the paper) ─────────────────────── */
+/* ─── Canvas Workspace (Cozy Study Desk Backdrop) ────────────────────────── */
 
 #canvas-workspace {
   flex: 1;
-  background: #b8b4ab;
-  padding: 20px;
+  background: var(--bg-desk);
+  padding: 30px;
   overflow: hidden;
   display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 0;
 }
 
-/* ─── Canvas Container (the "paper sheet") ───────────────────────────────── */
+/* ─── Realistic Open Binder Layout ───────────────────────────────────────── */
+
+#notebook-desk-binder {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-paper);
+  border: 4px solid var(--border-strong);
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  padding-left: 54px; /* Leave space for heavy left spiral rings */
+}
+
+/* Heavy central/left binder rings */
+.notebook-spiral-rings {
+  position: absolute;
+  left: 14px;
+  top: 4%;
+  bottom: 4%;
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+  border-right: 2px dashed rgba(55, 45, 30, 0.18);
+  pointer-events: none;
+}
+
+.notebook-spiral-rings .ring {
+  width: 26px;
+  height: 10px;
+  background: linear-gradient(135deg, #f0f0eb, #9ca098, #dcdcd6, #7a7e75);
+  border: 1.5px solid #5a5d56;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(55, 45, 30, 0.16);
+}
+
+/* ─── Canvas Container (Ruled Sheet on Desk) ─────────────────────────────── */
 
 #canvas-container {
   flex: 1;
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-paper);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
   min-width: 0;
   min-height: 0;
 }
@@ -862,4 +2402,1306 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+}
+
+/* ─── Smaller devices optimization ────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  #fm-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    height: auto;
+    padding: 16px 20px;
+  }
+  
+  .fm-brand-container {
+    justify-content: space-between;
+  }
+  
+  .fm-actions {
+    flex-direction: row;
+  }
+  
+  .search-wrapper, #fm-search {
+    width: 100%;
+    flex: 1;
+  }
+  
+  #fm-stats-strip {
+    grid-template-columns: 1fr 1fr;
+    padding: 16px 20px;
+    gap: 12px;
+  }
+  
+  #fm-filters-wrapper {
+    padding: 0 20px;
+  }
+  
+  #notebook-grid {
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  #editor-header {
+    padding: 0 16px;
+  }
+  
+  .editor-header-actions {
+    gap: 8px;
+  }
+  
+  #editor-header input[type="range"] {
+    width: 60px;
+  }
+  
+  #canvas-workspace {
+    padding: 12px;
+  }
+  
+  #notebook-desk-binder {
+    padding-left: 42px;
+  }
+  
+  .notebook-spiral-rings {
+    left: 8px;
+    width: 24px;
+  }
+  
+  .notebook-spiral-rings .ring {
+    width: 20px;
+    height: 8px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SETTINGS MODAL & TRIGGER BUTTONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Settings Gear Trigger Button */
+.settings-trigger-btn {
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+  background: #fbf9f4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 2px 6px rgba(55, 45, 30, 0.05);
+}
+
+.settings-trigger-btn:hover {
+  background: var(--highlight);
+  border-color: var(--border-strong);
+  transform: scale(1.1) rotate(45deg);
+  box-shadow: 0 4px 12px rgba(55, 45, 30, 0.12);
+}
+
+.settings-trigger-btn:active {
+  transform: scale(0.95) rotate(45deg);
+}
+
+.settings-trigger-btn img {
+  width: 100%;
+  height: 100%;
+  transition: filter 0.15s ease;
+}
+
+/* Settings Modal Specifics */
+.settings-box {
+  width: 460px;
+  padding: 30px 32px;
+}
+
+.settings-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-strong);
+  padding-bottom: 12px;
+}
+
+.settings-modal-header h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.settings-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.15s, transform 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.settings-close-btn:hover {
+  color: var(--ink);
+  background: var(--border-strong);
+  transform: scale(1.05);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-section-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.settings-section-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+/* Appearance Theme Options */
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theme-option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-strong);
+  background: #fbf9f4;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  user-select: none;
+}
+
+.theme-option-card:hover {
+  background: #f0ece4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(55, 45, 30, 0.05);
+}
+
+.theme-option-card.active {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+  box-shadow: 0 4px 12px rgba(38, 63, 103, 0.06);
+}
+
+.theme-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-strong);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.theme-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.theme-lbl {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.theme-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* active hover overrides to avoid weird borders */
+.theme-option-card.active:hover {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GENUINE DARK MODE OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root[data-theme="dark"] {
+  /* Dynamic Study Theme dark tokens */
+  --app-bg: #0f1420;
+  --app-bg-2: #151b2a;
+  --surface: #1b2232;
+  --surface-elevated: #242c3d;
+  --surface-soft: #202838;
+  --ink: #f5efe5;
+  --muted: #b7ad9f;
+  --border: rgba(255, 255, 255, 0.12);
+  --accent: #8fb4ff;
+  --accent-soft: rgba(143, 180, 255, 0.16);
+  --highlight: #f4d35e;
+  --coral: #e89b8f;
+  --sage: #a9bd91;
+  --shadow-paper: 0 24px 70px rgba(0, 0, 0, 0.55);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 32px 80px rgba(0, 0, 0, 0.6);
+
+  /* Mapping to internal components color schemas */
+  --bg-desk: var(--app-bg);
+  --paper-deep: var(--surface-soft);
+  --navy: var(--accent);
+  --navy-soft: var(--accent-soft);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --accent-dark: #b8cfff;
+  
+  --folder-tan: #b89c6d;
+  --line-blue: #546a7d;
+}
+
+/* ─── File Manager elements in Dark Mode ─── */
+
+:root[data-theme="dark"] #file-manager-view {
+  background-color: #0f1420;
+  background-image: 
+    radial-gradient(circle at top left, rgba(254, 229, 138, 0.05) 0%, rgba(254, 229, 138, 0.02) 40%, transparent 70%), /* soft amber desk lamp glow */
+    radial-gradient(rgba(255, 255, 255, 0.02) 1.5px, transparent 1.5px),
+    radial-gradient(rgba(255, 255, 255, 0.02) 1.5px, #0f1420 1.5px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: 0 0, 0 0, 20px 20px;
+  background-repeat: no-repeat, repeat, repeat;
+}
+
+:root[data-theme="dark"] #fm-header {
+  background: var(--surface);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .semester-badge {
+  background: #252818;
+  color: #d1c18c;
+  border-color: rgba(209, 193, 140, 0.4);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+:root[data-theme="dark"] #fm-search {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+  border-style: dashed;
+  border-radius: 6px;
+  font-family: var(--font-hand);
+}
+
+:root[data-theme="dark"] #fm-search:focus {
+  background: var(--surface-elevated);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(143, 180, 255, 0.2);
+}
+
+:root[data-theme="dark"] .settings-trigger-btn {
+  background: var(--surface-soft);
+}
+
+:root[data-theme="dark"] .settings-trigger-btn img {
+  filter: invert(1);
+}
+
+:root[data-theme="dark"] .settings-trigger-btn:hover {
+  background: var(--highlight);
+}
+
+:root[data-theme="dark"] .settings-trigger-btn:hover img {
+  filter: none; /* keep gear dark against the yellow accent on hover */
+}
+
+/* Filter overlapping tabs in Dark Mode */
+:root[data-theme="dark"] .filter-tab {
+  background: var(--app-bg-2);
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .filter-tab:hover {
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .filter-tab.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Study Stats Strip in Dark Mode */
+:root[data-theme="dark"] .desk-item {
+  background: var(--surface) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .paperclip-shape {
+  border-color: #6a6f66;
+}
+
+:root[data-theme="dark"] .paperclip-shape::after {
+  border-color: #7d8279;
+}
+
+:root[data-theme="dark"] .desk-item-icon {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .timetable-card .desk-item-val { color: #f4d35e; }
+:root[data-theme="dark"] .stats-recent .desk-item-val { color: var(--coral); }
+:root[data-theme="dark"] .stats-notebooks .desk-item-val { color: var(--sage); }
+:root[data-theme="dark"] .stats-lined .desk-item-val { color: var(--accent); }
+
+/* Notebook Cards in Dark Mode */
+:root[data-theme="dark"] .card-preview {
+  background: var(--paper); /* retain physically beautiful light/warm paper */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .card-notebook-label {
+  background: var(--surface-elevated);
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .card-info {
+  background: var(--surface-soft);
+  border-color: var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .card-action-btn {
+  background: var(--surface-elevated);
+}
+
+:root[data-theme="dark"] .card-action-btn img {
+  filter: invert(0.9);
+}
+
+:root[data-theme="dark"] .card-action-btn:hover {
+  background: var(--accent);
+}
+
+:root[data-theme="dark"] .card-action-btn:hover img {
+  filter: invert(1);
+}
+
+/* Desk Mat & Immersive Sections in Dark Mode */
+:root[data-theme="dark"] .desk-mat {
+  background: #151b28;
+  border-color: #2a3447;
+  border-image: linear-gradient(135deg, #2a3447 0%, #171d2a 100%) 10;
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.45), 0 16px 45px rgba(0, 0, 0, 0.55);
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(255, 255, 255, 0.008) 27px, rgba(255, 255, 255, 0.008) 28px),
+    radial-gradient(rgba(255, 255, 255, 0.015) 1.5px, transparent 1.5px);
+}
+
+/* Immersive Active Study Desk in Dark Mode */
+:root[data-theme="dark"] .active-study-desk {
+  background: #121620; /* Sleek dark tray color */
+  border-color: #2a3447;
+  border-image: linear-gradient(135deg, #2a3447 0%, #171d2a 100%) 10;
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.45), 0 16px 45px rgba(0, 0, 0, 0.55);
+  /* Gentle late-night lamp lighting radial glow overlay */
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(74, 144, 226, 0.08) 0%, transparent 70%),
+    repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(255, 255, 255, 0.008) 27px, rgba(255, 255, 255, 0.008) 28px),
+    radial-gradient(rgba(255, 255, 255, 0.015) 1.5px, transparent 1.5px);
+}
+
+:root[data-theme="dark"] .desk-header-label {
+  background: #1b212f;
+  border-color: #2a3447;
+  box-shadow: 2px 6px 15px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] .desk-header-label .desk-tape-pin {
+  background: rgba(255, 255, 255, 0.06);
+  border-left-color: rgba(255, 255, 255, 0.02);
+  border-right-color: rgba(255, 255, 255, 0.02);
+}
+
+:root[data-theme="dark"] .desk-header-text h3 {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .desk-zone-title {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .recent-notebook-wrapper {
+  background: rgba(255, 255, 255, 0.01);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .loose-sheet {
+  background: #19202e;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 2px 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .sheet-blank {
+  background-color: #161c28;
+}
+
+:root[data-theme="dark"] .sheet-blank .sheet-title {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .sheet-doodle-path {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme="dark"] .sheet-lined {
+  background-color: #19202e;
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent 0, transparent 16px, rgba(150, 180, 210, 0.15) 16px, rgba(150, 180, 210, 0.15) 17px),
+    linear-gradient(to right, transparent 28px, rgba(232, 155, 143, 0.22) 28px, rgba(232, 155, 143, 0.22) 29px, transparent 29px);
+}
+
+:root[data-theme="dark"] .sheet-lined .sheet-title {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .sheet-line {
+  color: #abb2bf;
+}
+
+:root[data-theme="dark"] .study-checklist-card {
+  background: #1b212f;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 3px 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] .study-checklist-card .desk-tape {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .study-checklist-card .checklist-title {
+  color: var(--accent);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .chk-item {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .sticky-reminder.color-yellow {
+  background: #2a2920;
+  border-color: #3b3a2f;
+}
+
+:root[data-theme="dark"] .sticky-reminder.color-orange {
+  background: #2b2520;
+  border-color: #3b332c;
+}
+
+:root[data-theme="dark"] .sticky-reminder.color-yellow .sticky-text {
+  color: #d1b447;
+}
+
+:root[data-theme="dark"] .sticky-reminder.color-orange .sticky-text {
+  color: #ff9800;
+}
+
+:root[data-theme="dark"] .sticky-reminder .desk-tape {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .subject-folder-stack {
+  background: #2b251d;
+  border-color: #3d3428;
+  box-shadow: 3px 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] .folder-tab-peeking {
+  background: #2b251d;
+  border-color: #3d3428;
+  color: #caa76b;
+}
+
+:root[data-theme="dark"] .folder-body-peek {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="dark"] .folder-line {
+  color: #caa76b;
+}
+
+:root[data-theme="dark"] .desk-paperclip {
+  border-color: #4b5263;
+}
+
+:root[data-theme="dark"] .desk-paperclip::after {
+  border-color: #5c6370;
+}
+
+/* Responsive Active Desk Surface Layout */
+@media (max-width: 992px) {
+  .desk-zones {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  
+  .recent-notebook-wrapper,
+  .loose-paper-stack,
+  .reminders-container {
+    height: auto;
+    min-height: unset;
+  }
+  
+  .loose-paper-stack {
+    height: 350px;
+  }
+  
+  .reminders-container {
+    height: auto;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .active-study-desk {
+    padding: 24px 16px;
+    border-width: 6px;
+  }
+  
+  .desk-header-label {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 24px;
+    transform: none;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+  
+  .desk-header-label .desk-tape-pin {
+    display: none;
+  }
+  
+  .desk-pencil {
+    display: none;
+  }
+  
+  .sheet-blank {
+    display: none;
+  }
+  
+  .sheet-lined {
+    left: 0;
+    top: 0;
+    width: 100%;
+    position: relative;
+    transform: none;
+    height: auto;
+    min-height: 200px;
+  }
+  
+  .study-checklist-card {
+    position: relative;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    margin-top: 16px;
+    transform: none;
+    height: auto;
+  }
+  
+  .loose-paper-stack {
+    height: auto;
+  }
+}
+
+:root[data-theme="dark"] .shelf-header h2,
+:root[data-theme="dark"] .section-label-maker h3 {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .shelf-sub,
+:root[data-theme="dark"] .section-label-maker .label-subtitle {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .workspace-divider-line {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .notebook-label-sticker {
+  background: #fcfaf5;
+  border-color: #554a3a;
+  box-shadow: inset 0 0 0 2px #fff, 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .notebook-label-sticker .card-title {
+  color: #212529;
+  border-bottom-color: rgba(55, 45, 30, 0.22);
+}
+
+:root[data-theme="dark"] .notebook-label-sticker .card-tag {
+  color: #7c7468;
+}
+
+/* Empty State stack in Dark Mode */
+:root[data-theme="dark"] .empty-title {
+  color: var(--accent);
+}
+
+/* ─── Modals (New notebook & Settings) in Dark Mode ─── */
+
+:root[data-theme="dark"] .modal-overlay {
+  background: rgba(10, 14, 23, 0.7);
+}
+
+:root[data-theme="dark"] .modal-box {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-modal);
+}
+
+:root[data-theme="dark"] .modal-box h2,
+:root[data-theme="dark"] .modal-box > label,
+:root[data-theme="dark"] .settings-modal-header h2,
+:root[data-theme="dark"] .settings-section-lbl {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .modal-desc,
+:root[data-theme="dark"] .settings-section-desc {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .modal-box input[type="text"] {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .modal-box input[type="text"]:focus {
+  background: var(--surface-elevated);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(143, 180, 255, 0.2);
+}
+
+:root[data-theme="dark"] .sub-chip {
+  background: var(--surface-soft);
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .sub-chip:hover {
+  background: var(--surface-elevated);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .sub-chip.active {
+  background: var(--highlight);
+  border-color: #d1b447;
+  color: #705809;
+}
+
+:root[data-theme="dark"] .style-card {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .style-card span {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .style-card:has(input:checked) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+:root[data-theme="dark"] .style-card:has(input:checked) span {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] .modal-actions button {
+  background: var(--surface-soft);
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .modal-actions button:hover {
+  background: var(--surface-elevated);
+  color: var(--ink);
+}
+
+/* Settings modal cards in Dark Mode */
+:root[data-theme="dark"] .theme-option-card {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .theme-option-card:hover {
+  background: var(--surface-elevated);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+:root[data-theme="dark"] .theme-option-card.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 4px 12px rgba(143, 180, 255, 0.08);
+}
+
+:root[data-theme="dark"] .theme-option-card.active:hover {
+  background: var(--accent-soft);
+}
+
+:root[data-theme="dark"] .theme-icon {
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+
+/* ─── Editor Screen in Dark Mode ─── */
+
+:root[data-theme="dark"] #editor-header {
+  background: var(--surface);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] #editor-back-btn {
+  background: #2a221f; /* dark mahogany slate */
+  border-color: #453733;
+  color: #ebdcb2; /* Manila gold text */
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] #editor-back-btn:hover {
+  background: #3d312c;
+  border-color: #5c4a43;
+  box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="dark"] #editor-back-btn::before {
+  background: var(--surface); /* grommet hole matches header backdrop */
+  border-color: #a89467; /* muted brass collar */
+}
+
+:root[data-theme="dark"] #editor-back-btn img {
+  filter: brightness(0) saturate(100%) invert(91%) sepia(21%) saturate(222%) hue-rotate(349deg) brightness(98%) contrast(92%); /* matches Manila text exactly */
+}
+
+:root[data-theme="dark"] #editor-back-btn:hover img {
+  filter: brightness(0) saturate(100%) invert(91%) sepia(21%) saturate(222%) hue-rotate(349deg) brightness(98%) contrast(92%);
+}
+
+:root[data-theme="dark"] .subject-badge {
+  background: #2d2621;
+  border-color: #d1b447;
+  color: #ebd680;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] #paper-theme-indicator {
+  color: #ebdcb2;
+  background: #2d2621;
+  border-color: #4f413a;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] #paper-theme-indicator:hover {
+  background: #3d312c;
+  border-color: #5c4a43;
+}
+
+:root[data-theme="dark"] #editor-title {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] #editor-header input[type="color"] {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] #editor-header input[type="range"] {
+  background: var(--surface-soft);
+}
+
+:root[data-theme="dark"] #sizeLabel {
+  color: var(--accent);
+}
+
+:root[data-theme="dark"] #canvas-workspace {
+  background-color: #0f1420;
+  background-image: 
+    radial-gradient(circle at top left, rgba(254, 229, 138, 0.08) 0%, rgba(254, 229, 138, 0.02) 40%, transparent 75%), /* warm amber lamp glow */
+    radial-gradient(rgba(255, 255, 255, 0.02) 1.5px, transparent 1.5px),
+    radial-gradient(rgba(255, 255, 255, 0.02) 1.5px, #0f1420 1.5px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: 0 0, 0 0, 20px 20px;
+  background-repeat: no-repeat, repeat, repeat;
+}
+
+:root[data-theme="dark"] #editor-toolbar {
+  background: #121824; /* deep navy felt lining */
+  border: 3px solid #2c221e; /* dark mahogany wooden lip */
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.4), 
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="dark"] .tool-btn,
+:root[data-theme="dark"] .page-btn,
+:root[data-theme="dark"] .action-btn {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .tool-btn img,
+:root[data-theme="dark"] .page-btn img,
+:root[data-theme="dark"] .action-btn img {
+  filter: invert(0.9);
+}
+
+:root[data-theme="dark"] .tool-btn:hover,
+:root[data-theme="dark"] .page-btn:hover,
+:root[data-theme="dark"] .action-btn:hover {
+  background: var(--surface-elevated);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] .tool-btn.active[data-tool="pen"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 6px 12px rgba(143, 180, 255, 0.25);
+}
+
+:root[data-theme="dark"] .tool-btn.active[data-tool="highlighter"] {
+  border-color: #f4d35e;
+  background: rgba(244, 211, 94, 0.16);
+  box-shadow: 0 6px 12px rgba(244, 211, 94, 0.25);
+}
+
+:root[data-theme="dark"] .tool-btn.active[data-tool="eraser"] {
+  border-color: var(--coral);
+  background: rgba(232, 155, 143, 0.16);
+  box-shadow: 0 6px 12px rgba(232, 155, 143, 0.25);
+}
+
+:root[data-theme="dark"] .tool-btn.active[data-tool="line"],
+:root[data-theme="dark"] .tool-btn.active[data-tool="spray"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 6px 12px rgba(143, 180, 255, 0.25);
+}
+
+:root[data-theme="dark"] .page-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 6px 12px rgba(143, 180, 255, 0.25);
+}
+
+/* Ensure the central binder mockup keeps its original brown leather cover feel/border, but looks good */
+:root[data-theme="dark"] #notebook-desk-binder {
+  border-color: rgba(55, 45, 30, 0.18); /* keep physical book border dark brown/black */
+  box-shadow: var(--shadow-paper);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE THEME / PAPER APPEARANCE STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Paper Theme Indicator Label in Toolbar (Inkwell Badge Button) */
+#paper-theme-indicator.toolbar-paper-label {
+  font-family: var(--font-hand);
+  font-size: 11px;
+  font-weight: 700;
+  color: #705809;
+  background: #fdf6e2;
+  border: 1.5px solid #ebdcb2;
+  border-radius: 12px;
+  padding: 4px 12px;
+  margin-left: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  box-shadow: 1px 2px 4px rgba(55, 45, 30, 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  opacity: 1;
+}
+
+#paper-theme-indicator.toolbar-paper-label:hover {
+  background: #eed59e;
+  border-color: #c9b485;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 1px 3px 6px rgba(55, 45, 30, 0.1);
+}
+
+#paper-theme-indicator.toolbar-paper-label:active {
+  transform: translateY(0) scale(1);
+}
+
+/* Settings Modal Page Theme Option Cards */
+.page-theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-theme-option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-strong);
+  background: #fbf9f4;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  user-select: none;
+}
+
+.page-theme-option-card:hover {
+  background: #f0ece4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(55, 45, 30, 0.05);
+}
+
+.page-theme-option-card.active {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+  box-shadow: 0 4px 12px rgba(38, 63, 103, 0.06);
+}
+
+.page-theme-option-card.active:hover {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+/* Modal Paper Appearance Selection Chips */
+.paper-theme-selector-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.paper-theme-chip {
+  border: 1.5px solid var(--border-strong);
+  background: #fbf9f4;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: var(--font-main);
+}
+
+.paper-theme-chip:hover {
+  background: #f0ece4;
+  color: var(--ink);
+}
+
+.paper-theme-chip.active {
+  background: var(--highlight);
+  border-color: #d1b447;
+  color: #705809;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+}
+
+/* Light vs Dark page appearances on card previews in library */
+.card-preview.dark {
+  background: #101624 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.card-preview.dark.blank {
+  background: #101624 !important;
+}
+
+.card-preview.dark.lined {
+  background: #101624 !important;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 15px,
+      rgba(150, 180, 210, 0.22) 15px,
+      rgba(150, 180, 210, 0.22) 16px
+    ),
+    linear-gradient(
+      to right,
+      transparent 22px,
+      rgba(232, 155, 143, 0.32) 22px,
+      rgba(232, 155, 143, 0.32) 23px,
+      transparent 23px
+    ) !important;
+  background-position: 0 18px, 0 0 !important;
+}
+
+/* Dark Mode Overrides for newly added elements */
+:root[data-theme="dark"] .page-theme-option-card {
+  background: var(--surface-soft);
+  border-color: var(--border);
+}
+
+:root[data-theme="dark"] .page-theme-option-card:hover {
+  background: var(--surface-elevated);
+}
+
+:root[data-theme="dark"] .page-theme-option-card.active {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+:root[data-theme="dark"] .paper-theme-chip {
+  background: var(--surface-soft);
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+
+:root[data-theme="dark"] .paper-theme-chip:hover {
+  background: var(--surface-elevated);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .paper-theme-chip.active {
+  background: var(--highlight);
+  border-color: #d1b447;
+  color: #705809;
+}
+
+/* ─── Open Notebook Page Appearance Overrides ─── */
+#notebook-desk-binder.dark-paper {
+  background-color: #101624 !important;
+  border-color: #0b0f19 !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+#notebook-desk-binder.dark-paper .notebook-spiral-rings {
+  border-right: 2px dashed rgba(255, 255, 255, 0.08);
+}
+#notebook-desk-binder.dark-paper .ring {
+  background: linear-gradient(to bottom, #cfd2cd, #70736c, #3d3f3b, #cfd2cd);
+  border-color: #2b2d2a;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+#notebook-desk-binder.light-paper {
+  background-color: var(--paper) !important;
+  border-color: var(--border-strong) !important;
+  box-shadow: var(--shadow-paper);
+}
+#notebook-desk-binder.light-paper .notebook-spiral-rings {
+  border-right: 2px dashed rgba(55, 45, 30, 0.18);
+}
+#notebook-desk-binder.light-paper .ring {
+  background: linear-gradient(135deg, #f0f0eb, #9ca098, #dcdcd6, #7a7e75);
+  border-color: #5a5d56;
+  box-shadow: 2px 2px 5px rgba(55, 45, 30, 0.16);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOOL-SPECIFIC CURSORS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Base: default arrow when no specific tool is active */
+#canvas-container {
+  cursor: default;
+}
+
+/* Pen — custom pen-tip SVG cursor, hotspot at tip (2,30) */
+#canvas-container[data-active-tool="pen"] {
+  cursor: url('../assets/cursors/pen-cursor.svg') 2 30, crosshair;
+}
+
+/* Highlighter — angled marker SVG cursor, hotspot near tip (2,28) */
+#canvas-container[data-active-tool="highlighter"] {
+  cursor: url('../assets/cursors/highlighter-cursor.svg') 2 28, crosshair;
+}
+
+/* Eraser — hide CSS cursor; the p5 preview circle IS the cursor */
+#canvas-container[data-active-tool="eraser"] {
+  cursor: none;
+}
+
+/* Line — crosshair ruler SVG cursor, center hotspot (16,16) */
+#canvas-container[data-active-tool="line"] {
+  cursor: url('../assets/cursors/line-cursor.svg') 16 16, crosshair;
+}
+
+/* Spray — spray can SVG cursor, hotspot at nozzle (4,4) */
+#canvas-container[data-active-tool="spray"] {
+  cursor: url('../assets/cursors/spray-cursor.svg') 4 4, crosshair;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COLOR PICKER SECTION (dims when eraser active)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.color-picker-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.18s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ERASER OPTIONS PANEL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.eraser-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.eraser-options.hidden {
+  display: none;
+}
+
+/* Shape and mode buttons share the same round slot style as tool-btn,
+   but slightly smaller with inline SVG icons */
+.eraser-shape-btn,
+.eraser-mode-btn {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(55, 45, 30, 0.12);
+  border-radius: 50%;
+  background: #faf8f5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #7c7468;
+  transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(55, 45, 30, 0.04);
+}
+
+.eraser-shape-btn:hover,
+.eraser-mode-btn:hover {
+  background: #ffffff;
+  border-color: rgba(55, 45, 30, 0.22);
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 4px 8px rgba(55, 45, 30, 0.1);
+  color: #4a4442;
+}
+
+/* Active eraser shape — coral/pink accent (matches eraser tool colour) */
+.eraser-shape-btn.active {
+  background: var(--coral-soft);
+  border-color: #c96253;
+  border-width: 2px;
+  color: #c96253;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(201, 98, 83, 0.25);
+}
+
+/* Active precision mode — deep navy accent */
+.eraser-mode-btn.active {
+  background: #e1e7f0;
+  border-color: var(--navy);
+  border-width: 2px;
+  color: var(--navy);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(38, 63, 103, 0.2);
+}
+
+/* SVG inside eraser option buttons */
+.eraser-shape-btn svg,
+.eraser-mode-btn svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Eraser shape group gap */
+.eraser-shape-group,
+.eraser-mode-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Dark Mode: Eraser Options Panel ─────────────────────────────────────── */
+
+:root[data-theme="dark"] .eraser-shape-btn,
+:root[data-theme="dark"] .eraser-mode-btn {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--muted);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .eraser-shape-btn:hover,
+:root[data-theme="dark"] .eraser-mode-btn:hover {
+  background: var(--surface-elevated);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .eraser-shape-btn.active {
+  background: rgba(232, 155, 143, 0.16);
+  border-color: var(--coral);
+  color: var(--coral);
+  box-shadow: 0 4px 8px rgba(232, 155, 143, 0.25);
+}
+
+:root[data-theme="dark"] .eraser-mode-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 4px 8px rgba(143, 180, 255, 0.2);
+}
+
+/* ─── Dark Mode: Tool img filters for eraser option SVGs ──────────────────── */
+:root[data-theme="dark"] .eraser-shape-btn svg,
+:root[data-theme="dark"] .eraser-mode-btn svg {
+  filter: brightness(1.4);
+}
+
+/* ─── Mobile: eraser panel wraps below on narrow viewports ───────────────── */
+@media (max-width: 768px) {
+  .eraser-options {
+    gap: 6px;
+  }
+
+  .eraser-shape-btn,
+  .eraser-mode-btn {
+    width: 28px;
+    height: 28px;
+  }
 }

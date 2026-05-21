@@ -12,6 +12,7 @@
   <!-- App state and storage first -->
   <script defer src="app/AppState.js"></script>
   <script defer src="app/StorageManager.js"></script>
+  <script defer src="app/ThemeManager.js"></script>
 
   <!-- p5 helpers -->
   <script defer src="ui/PageBackground.js"></script>
@@ -37,29 +38,86 @@
   <div id="file-manager-view">
 
     <header id="fm-header">
-      <div class="fm-brand">
-        <h1 id="fm-app-name">Notebook</h1>
-        <p id="fm-subtitle">Your digital drawing notebooks</p>
+      <div class="fm-brand-container">
+        <div class="fm-brand">
+          <h1 id="fm-app-name">My Notebooks</h1>
+          <p id="fm-subtitle">Organise your class notes, sketches, and study pages.</p>
+        </div>
+        <span class="semester-badge">Semester Workspace</span>
       </div>
       <div class="fm-actions">
-        <input type="text" id="fm-search" placeholder="Search notebooks…" autocomplete="off" spellcheck="false">
+        <div class="search-wrapper">
+          <input type="text" id="fm-search" placeholder="Search subjects or notebooks…" autocomplete="off" spellcheck="false">
+        </div>
         <button id="new-notebook-btn" aria-label="Create new notebook">
           <img src="assets/icons/new-file.svg" alt="">
           New Notebook
         </button>
+        <button id="fm-settings-btn" class="settings-trigger-btn" aria-label="Open Settings" title="Settings">
+          <img src="assets/icons/settings.svg" alt="Settings">
+        </button>
       </div>
     </header>
 
-    <!-- Filter tabs -->
-    <div id="fm-filters">
-      <button class="filter-tab active" data-filter="all">All</button>
-      <button class="filter-tab" data-filter="recent">Recent</button>
-      <button class="filter-tab" data-filter="lined">Lined</button>
-      <button class="filter-tab" data-filter="blank">Blank</button>
+    <!-- Study Desk Items Strip -->
+    <div id="fm-stats-strip" class="study-strip">
+      <!-- Timetable Card -->
+      <div class="desk-item timetable-card">
+        <div class="tape-strip"></div>
+        <span class="desk-item-icon">📅</span>
+        <div class="desk-item-content">
+          <span class="desk-item-val" id="stat-timetable-val">CS / Maths</span>
+          <span class="desk-item-lbl">Today's Class</span>
+        </div>
+      </div>
+      <!-- Sticky Note -->
+      <div class="desk-item sticky-note stats-recent">
+        <div class="tape-strip"></div>
+        <span class="desk-item-icon">⚡</span>
+        <div class="desk-item-content">
+          <span class="desk-item-val" id="stat-recent-val">0</span>
+          <span class="desk-item-lbl">Recent Notes</span>
+        </div>
+      </div>
+      <!-- Binder index card -->
+      <div class="desk-item index-card stats-notebooks">
+        <div class="paperclip-shape"></div>
+        <span class="desk-item-icon">📚</span>
+        <div class="desk-item-content">
+          <span class="desk-item-val" id="stat-total-val">0</span>
+          <span class="desk-item-lbl">Binder Books</span>
+        </div>
+      </div>
+      <!-- Loose paper slip -->
+      <div class="desk-item paper-slip stats-lined">
+        <span class="desk-item-icon">📝</span>
+        <div class="desk-item-content">
+          <span class="desk-item-val" id="stat-lined-val">0</span>
+          <span class="desk-item-lbl">Study Pages</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Notebook cards rendered here by FileManagerView.render() -->
-    <div id="notebook-grid"></div>
+    <!-- Filter tabs styled as notebook index tabs -->
+    <div id="fm-filters-wrapper">
+      <div id="fm-filters" class="binder-tabs">
+        <button class="filter-tab active" data-filter="all">All Notes</button>
+        <button class="filter-tab" data-filter="recent">Recent</button>
+        <button class="filter-tab" data-filter="lined">Lined Paper</button>
+        <button class="filter-tab" data-filter="blank">Blank Paper</button>
+      </div>
+    </div>
+
+    <!-- Notebook shelf desk mat area -->
+    <div class="desk-mat">
+      <div class="shelf-header">
+        <span class="shelf-label-icon">📂</span>
+        <h2>My Notebook Shelf</h2>
+        <span class="shelf-sub">Pick a subject book to open on the desk.</span>
+      </div>
+      <!-- Notebook cards rendered here by FileManagerView.render() -->
+      <div id="notebook-grid" class="notebook-shelf"></div>
+    </div>
 
   </div>
 
@@ -69,13 +127,19 @@
 
     <!-- Top header: back + title + controls + save -->
     <div id="editor-header">
-      <button id="editor-back-btn" aria-label="Back to library">
+      <button id="editor-back-btn" aria-label="Back to shelf">
         <img src="assets/icons/back.svg" alt="Back">
+        <span>Back to Shelf</span>
       </button>
-      <span id="editor-title"></span>
+      <div id="editor-title-container">
+        <span id="editor-title"></span>
+        <span id="editor-subject-badge" class="subject-badge">Other</span>
+      </div>
       <div class="editor-header-actions">
-        <label class="ctrl-label" for="colorPicker">Color</label>
-        <input type="color" id="colorPicker" value="#000000" title="Stroke colour">
+        <span id="color-picker-section" class="color-picker-section">
+          <label class="ctrl-label" for="colorPicker">Color</label>
+          <input type="color" id="colorPicker" value="#000000" title="Stroke colour">
+        </span>
         <label class="ctrl-label" for="strokeSize">Size</label>
         <input type="range" id="strokeSize" min="1" max="40" value="4" title="Stroke size">
         <span id="sizeLabel">4px</span>
@@ -83,55 +147,107 @@
           <img src="assets/icons/save.svg" alt="">
           Save PNG
         </button>
+        <button id="editor-settings-btn" class="settings-trigger-btn" aria-label="Open Settings" title="Settings">
+          <img src="assets/icons/settings.svg" alt="Settings">
+        </button>
       </div>
     </div>
 
     <!-- Body: horizontal toolbar + canvas workspace -->
     <div id="editor-body">
 
-      <!-- Horizontal tool dock -->
+      <!-- Horizontal tool dock styled like a pencil case -->
       <div id="editor-toolbar" role="toolbar" aria-label="Drawing tools">
 
-        <!-- Drawing tools -->
-        <button class="tool-btn active" data-tool="pen"         title="Pen"         aria-label="Pen">
-          <img src="assets/icons/pen.svg" alt="Pen">
-        </button>
-        <button class="tool-btn"        data-tool="highlighter" title="Highlighter" aria-label="Highlighter">
-          <img src="assets/icons/highlighter.svg" alt="Highlighter">
-        </button>
-        <button class="tool-btn"        data-tool="eraser"      title="Eraser"      aria-label="Eraser">
-          <img src="assets/icons/eraser.svg" alt="Eraser">
-        </button>
-        <button class="tool-btn"        data-tool="line"        title="Line"        aria-label="Line">
-          <img src="assets/icons/line.svg" alt="Line">
-        </button>
-        <button class="tool-btn"        data-tool="spray"       title="Spray"       aria-label="Spray">
-          <img src="assets/icons/spray.svg" alt="Spray">
-        </button>
+        <span class="toolbar-section-lbl">Writing Tools</span>
+        <div class="tool-group">
+          <button class="tool-btn active" data-tool="pen"         title="Pen"         aria-label="Pen">
+            <img src="assets/icons/pen.svg" alt="Pen">
+          </button>
+          <button class="tool-btn"        data-tool="highlighter" title="Highlighter" aria-label="Highlighter">
+            <img src="assets/icons/highlighter.svg" alt="Highlighter">
+          </button>
+          <button class="tool-btn"        data-tool="eraser"      title="Eraser"      aria-label="Eraser">
+            <img src="assets/icons/eraser.svg" alt="Eraser">
+          </button>
+          <button class="tool-btn"        data-tool="line"        title="Line"        aria-label="Line">
+            <img src="assets/icons/line.svg" alt="Line">
+          </button>
+          <button class="tool-btn"        data-tool="spray"       title="Spray"       aria-label="Spray">
+            <img src="assets/icons/spray.svg" alt="Spray">
+          </button>
+        </div>
 
         <div class="toolbar-divider"></div>
 
-        <!-- Page background mode -->
-        <button class="page-btn"        data-page="blank" title="Blank page" aria-label="Blank page">
-          <img src="assets/icons/blank-page.svg" alt="Blank">
-        </button>
-        <button class="page-btn active" data-page="lined" title="Lined page" aria-label="Lined page">
-          <img src="assets/icons/lined-page.svg" alt="Lined">
-        </button>
+        <span class="toolbar-section-lbl">Page Style</span>
+        <div class="tool-group">
+          <button class="page-btn"        data-page="blank" title="Blank page" aria-label="Blank page">
+            <img src="assets/icons/blank-page.svg" alt="Blank">
+          </button>
+          <button class="page-btn active" data-page="lined" title="Lined page" aria-label="Lined page">
+            <img src="assets/icons/lined-page.svg" alt="Lined">
+          </button>
+          <button id="paper-theme-indicator" class="toolbar-paper-label" title="Cycle paper appearance" type="button">Paper: Auto</button>
+        </div>
 
         <div class="toolbar-divider"></div>
 
-        <!-- Clear action -->
+        <!-- Eraser options panel — visible only when eraser is active -->
+        <div id="eraser-options" class="eraser-options hidden" role="group" aria-label="Eraser options">
+          <span class="toolbar-section-lbl">Shape</span>
+          <div class="tool-group eraser-shape-group">
+            <button class="eraser-shape-btn active" data-shape="round" title="Round eraser" aria-label="Round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+            <button class="eraser-shape-btn" data-shape="square" title="Square eraser" aria-label="Square">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+            <button class="eraser-shape-btn" data-shape="soft" title="Soft eraser" aria-label="Soft">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2"/><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-divider" style="height:20px;"></div>
+
+          <span class="toolbar-section-lbl">Mode</span>
+          <div class="tool-group eraser-mode-group">
+            <button class="eraser-mode-btn active" data-mode="normal" title="Normal eraser" aria-label="Normal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M12 4 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M8 3 3 8" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.4"/></svg>
+            </button>
+            <button class="eraser-mode-btn" data-mode="precision" title="Precision mode" aria-label="Precision">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="1" x2="8" y2="4" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="12" x2="8" y2="15" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="8" x2="4" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+          </div>
+        </div><!-- #eraser-options -->
+
+        <div class="toolbar-divider"></div>
+
+        <span class="toolbar-section-lbl">Actions</span>
         <button class="action-btn" data-action="clear" title="Clear drawing" aria-label="Clear">
           <img src="assets/icons/clear.svg" alt="Clear">
         </button>
 
       </div><!-- #editor-toolbar -->
 
-      <!-- Canvas workspace: dark desk area surrounding the paper canvas -->
+      <!-- Canvas workspace: realistic student study desk pad/notebook layout -->
       <div id="canvas-workspace">
-        <!-- p5 canvas injected here by sketch.js setup() via cnv.parent('canvas-container') -->
-        <div id="canvas-container"></div>
+        <div id="notebook-desk-binder">
+          <div class="notebook-spiral-rings">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+          </div>
+          <!-- p5 canvas injected here by sketch.js setup() via cnv.parent('canvas-container') -->
+          <div id="canvas-container"></div>
+        </div>
       </div>
 
     </div><!-- #editor-body -->
@@ -143,34 +259,147 @@
   <div id="new-notebook-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Create new notebook">
     <div class="modal-box">
 
-      <h2>Create notebook</h2>
-      <p class="modal-desc">Choose a name and paper style.</p>
+      <h2>Create a new notebook</h2>
+      <p class="modal-desc">Design a customized subject book for your class lectures and sketches.</p>
 
-      <label for="notebook-title-input">Name</label>
+      <label for="notebook-title-input">Notebook Name</label>
       <input type="text" id="notebook-title-input" value="Untitled Notebook"
              maxlength="80" autocomplete="off" spellcheck="false">
 
-      <label>Paper style</label>
+      <label>Subject / Category</label>
+      <div class="subject-chips">
+        <button type="button" class="sub-chip active" data-subject="Computer Science">Computer Science</button>
+        <button type="button" class="sub-chip" data-subject="Maths">Maths</button>
+        <button type="button" class="sub-chip" data-subject="Physics">Physics</button>
+        <button type="button" class="sub-chip" data-subject="Sketches">Sketches</button>
+        <button type="button" class="sub-chip" data-subject="Other">Other</button>
+      </div>
+
+      <label>Paper Style</label>
       <div class="page-style-options">
         <label class="style-card">
           <input type="radio" id="page-mode-lined" name="pageMode" value="lined" checked>
           <div class="style-preview lined"></div>
-          <span>Lined</span>
+          <span>Lined paper</span>
         </label>
         <label class="style-card">
           <input type="radio" id="page-mode-blank" name="pageMode" value="blank">
           <div class="style-preview blank"></div>
-          <span>Blank</span>
+          <span>Blank paper</span>
+        </label>
+      </div>
+
+      <label>Paper Appearance</label>
+      <div class="paper-theme-selector-chips">
+        <button type="button" class="paper-theme-chip active" data-value="system">Follow App Theme</button>
+        <button type="button" class="paper-theme-chip" data-value="light">Light Paper</button>
+        <button type="button" class="paper-theme-chip" data-value="dark">Dark Paper</button>
+      </div>
+
+      <label>Cover Theme Color</label>
+      <div class="cover-color-options">
+        <label class="color-dot navy active" title="Navy">
+          <input type="radio" name="coverColor" value="navy" checked>
+          <span class="dot-check"></span>
+        </label>
+        <label class="color-dot sage" title="Sage">
+          <input type="radio" name="coverColor" value="sage">
+          <span class="dot-check"></span>
+        </label>
+        <label class="color-dot tan" title="Tan">
+          <input type="radio" name="coverColor" value="tan">
+          <span class="dot-check"></span>
+        </label>
+        <label class="color-dot coral" title="Coral">
+          <input type="radio" name="coverColor" value="coral">
+          <span class="dot-check"></span>
+        </label>
+        <label class="color-dot blue" title="Blue">
+          <input type="radio" name="coverColor" value="blue">
+          <span class="dot-check"></span>
         </label>
       </div>
 
       <div class="modal-actions">
         <button id="modal-cancel">Cancel</button>
-        <button id="modal-create" class="btn-primary">Create</button>
+        <button id="modal-create" class="btn-primary">Create notebook</button>
       </div>
 
     </div>
   </div><!-- #new-notebook-modal -->
+
+
+  <!-- ═══ Settings Modal ═════════════════════════════════════════════════════ -->
+  <div id="settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="App Settings">
+    <div class="modal-box settings-box">
+      <div class="settings-modal-header">
+        <h2>Workspace Settings</h2>
+        <button id="settings-close" class="settings-close-btn" aria-label="Close settings">&times;</button>
+      </div>
+      
+      <div class="settings-section">
+        <label class="settings-section-lbl">Appearance Theme</label>
+        <p class="settings-section-desc">Choose a design mood for your classroom notebooks.</p>
+        
+        <div class="theme-options">
+          <div class="theme-option-card" data-value="light">
+            <span class="theme-icon">☀️</span>
+            <div class="theme-text">
+              <span class="theme-lbl">Light Mode</span>
+              <span class="theme-desc">Bright school notebook workspace</span>
+            </div>
+          </div>
+          
+          <div class="theme-option-card" data-value="dark">
+            <span class="theme-icon">🌙</span>
+            <div class="theme-text">
+              <span class="theme-lbl">Dark Mode</span>
+              <span class="theme-desc">Late-night study desk mode</span>
+            </div>
+          </div>
+          
+          <div class="theme-option-card" data-value="system">
+            <span class="theme-icon">💻</span>
+            <div class="theme-text">
+              <span class="theme-lbl">System Preference</span>
+              <span class="theme-desc">Match your device setting</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-top: 24px; border-top: 1.5px dashed var(--border-strong); padding-top: 16px;">
+        <label class="settings-section-lbl">Page Appearance</label>
+        <p class="settings-section-desc">Select the default notebook paper theme.</p>
+        
+        <div class="page-theme-options">
+          <div class="page-theme-option-card" data-value="light">
+            <span class="theme-icon">📄</span>
+            <div class="theme-text">
+              <span class="theme-lbl">Light Paper</span>
+              <span class="theme-desc">Classic cream notebook paper</span>
+            </div>
+          </div>
+          
+          <div class="page-theme-option-card" data-value="dark">
+            <span class="theme-icon">📓</span>
+            <div class="theme-text">
+              <span class="theme-lbl">Dark Paper</span>
+              <span class="theme-desc">Dark study paper for night notes</span>
+            </div>
+          </div>
+          
+          <div class="page-theme-option-card" data-value="system">
+            <span class="theme-icon">🔄</span>
+            <div class="theme-text">
+              <span class="theme-lbl">Follow App Theme</span>
+              <span class="theme-desc">Match the current app appearance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
