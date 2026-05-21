@@ -4079,3 +4079,94 @@ html, body {
   font-size: clamp(28px, 5vw, 52px) !important;
   overflow-wrap: break-word;
 }
+
+/* ── fix/match-dark-academic-reference-layout ── */
+
+/* A. Restore dark-academic cream/gold overridden by appended GoodNotes CSS */
+#file-manager-view h1 {
+  color: var(--cream) !important;
+}
+
+#file-manager-view .workspace-tag {
+  color: var(--gold) !important;
+  background: #120F0B !important;
+  border-color: var(--gold) !important;
+  border-radius: 3px !important;
+}
+
+#file-manager-view .tabs {
+  border-bottom-color: rgba(244, 239, 227, 0.11) !important;
+}
+
+#file-manager-view .tab {
+  color: var(--muted) !important;
+}
+
+#file-manager-view .tab:hover,
+#file-manager-view .tab.active,
+#file-manager-view .tab.is-active {
+  color: var(--cream) !important;
+}
+
+/* B. Dashboard shell — left-aligned layout */
+.dashboard-shell {
+  width: min(1240px, calc(100% - clamp(48px, 5vw, 96px))) !important;
+  margin: 0 auto 0 clamp(32px, 4vw, 64px) !important;
+}
+
+@media (min-width: 1440px) {
+  .dashboard-shell {
+    margin: 0 auto !important;
+  }
+}
+
+/* C. Shelf panel — remove absolute rule line, tighten padding */
+.shelf-rule {
+  display: none !important;
+}
+
+.shelf-panel {
+  padding: clamp(24px, 4vw, 42px) clamp(22px, 4vw, 48px) clamp(48px, 8vw, 96px) !important;
+}
+
+/* D. Shelf heading */
+.shelf-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+  border-bottom: 1px dashed rgba(200, 146, 42, 0.32);
+}
+
+.shelf-heading-icon {
+  color: var(--gold);
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.shelf-heading-text h2 {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: clamp(17px, 1.8vw, 22px);
+  font-weight: 600;
+  color: var(--cream);
+  margin: 0 0 3px;
+  line-height: 1.1;
+}
+
+.shelf-heading-text p {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* E. Stat card icons */
+.stat-card-icon {
+  display: block;
+  color: rgba(33, 25, 14, 0.36);
+  margin-bottom: 2px;
+}

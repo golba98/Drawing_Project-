@@ -252,15 +252,15 @@ const FileManagerView = {
     return `
       <div class="empty-state">
         <div class="book-shelf" aria-hidden="true">
-          <span class="book book-one">Logic</span>
-          <span class="book book-two">Drafts</span>
-          <span class="book book-three">Seminar</span>
-          <span class="book book-four">Proofs</span>
-          <span class="book book-five">Sketch</span>
-          <span class="book book-six">Labs</span>
-          <span class="book book-seven">Notes</span>
+          <span class="book book-one">Notes</span>
+          <span class="book book-two">Physics</span>
+          <span class="book book-three">Algo</span>
+          <span class="book book-four">DM</span>
+          <span class="book book-five">CM1025</span>
+          <span class="book book-six">Lab</span>
+          <span class="book book-seven">Essay</span>
         </div>
-        <h2>No notebooks on the shelf yet</h2>
+        <h2>No class notebooks yet</h2>
         <p>Create your first notebook for a subject, lecture, or sketch page.</p>
         <button class="ghost-create-btn empty-create-btn">Create first notebook</button>
       </div>
