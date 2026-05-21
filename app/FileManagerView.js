@@ -461,31 +461,25 @@ const FileManagerView = {
     if (isFiltered) {
       return `
         <div class="empty-state">
-          <p class="empty-title">No notes found</p>
-          <p class="empty-sub">Try searching another subject or class note.</p>
+          <h2>Nothing here</h2>
+          <p>Try a different filter or search term.</p>
         </div>
       `;
     }
     return `
-      <div class="empty-state animate-fade-in">
-        <div class="empty-shelf-stack">
-          <div class="shelf-notebook notebook-1">
-            <div class="shelf-spine"></div>
-            <span class="shelf-label">Maths</span>
-          </div>
-          <div class="shelf-notebook notebook-2">
-            <div class="shelf-spine"></div>
-            <span class="shelf-label">Science</span>
-          </div>
-          <div class="shelf-notebook notebook-3">
-            <div class="shelf-spine"></div>
-            <span class="shelf-label">Sketches</span>
-          </div>
+      <div class="empty-state">
+        <div class="book-shelf" aria-hidden="true">
+          <span class="book book-one">Logic</span>
+          <span class="book book-two">Drafts</span>
+          <span class="book book-three">Seminar</span>
+          <span class="book book-four">Proofs</span>
+          <span class="book book-five">Sketch</span>
+          <span class="book book-six">Labs</span>
+          <span class="book book-seven">Notes</span>
         </div>
-        <p class="empty-title">No class notebooks yet</p>
-        <p class="empty-sub">Create your first notebook for a subject, lecture, or sketch page.</p>
-        <button class="empty-create-btn">Create first notebook</button>
-        <p class="empty-hint">Choose lined paper for notes or blank paper for sketches.</p>
+        <h2>No notebooks on the shelf yet</h2>
+        <p>Create your first notebook for a subject, lecture, or sketch page.</p>
+        <button class="ghost-create-btn empty-create-btn">Create first notebook</button>
       </div>
     `;
   },

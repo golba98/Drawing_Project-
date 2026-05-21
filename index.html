@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notebook</title>
+  <title>My Notebooks</title>
+
+  <!-- Dark academic fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Editor / card fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 
   <!-- p5.js pinned to 1.9.4 for stable erase() API -->
@@ -34,91 +42,77 @@
 </head>
 <body>
 
-  <!-- ═══ View 1: File Manager ═══════════════════════════════════════════════ -->
+  <!-- ═══ View 1: File Manager (dark academic dashboard) ═══════════════════ -->
   <div id="file-manager-view">
+    <main class="dashboard-shell">
+      <nav class="topbar" aria-label="Notebook dashboard navigation">
+        <section class="brand-block" aria-labelledby="page-title">
+          <div class="brand-heading-row">
+            <div>
+              <h1 id="page-title">My Notebooks</h1>
+              <p class="brand-subtitle">Organise your class notes, sketches, and study pages.</p>
+            </div>
+            <span class="workspace-tag">Semester Workspace</span>
+          </div>
+        </section>
 
-    <header id="fm-header">
-      <div class="fm-brand-container">
-        <div class="fm-brand">
-          <h1 id="fm-app-name">My Notebooks</h1>
-          <p id="fm-subtitle">Organise your class notes, sketches, and study pages.</p>
-        </div>
-        <span class="semester-badge">Semester Workspace</span>
-      </div>
-      <div class="fm-actions">
-        <div class="search-wrapper">
-          <input type="text" id="fm-search" placeholder="Search subjects or notebooks…" autocomplete="off" spellcheck="false">
-        </div>
-        <button id="new-notebook-btn" aria-label="Create new notebook">
-          <img src="assets/icons/new-file.svg" alt="">
-          New Notebook
-        </button>
-        <button id="fm-settings-btn" class="settings-trigger-btn" aria-label="Open Settings" title="Settings">
-          <img src="assets/icons/settings.svg" alt="Settings">
-        </button>
-      </div>
-    </header>
+        <section class="nav-actions" aria-label="Notebook actions">
+          <label class="search-field">
+            <span class="sr-only">Search subjects or notebooks</span>
+            <!-- id="fm-search" required by FileManagerView.js -->
+            <input id="fm-search" type="search" placeholder="Search subjects or notebooks..." autocomplete="off">
+          </label>
+          <!-- id="new-notebook-btn" required by FileManagerView.js -->
+          <button id="new-notebook-btn" class="new-notebook-btn" type="button" aria-label="Create new notebook">
+            <svg aria-hidden="true" viewBox="0 0 16 16" focusable="false">
+              <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/>
+            </svg>
+            <span>New Notebook</span>
+          </button>
+          <!-- id="fm-settings-btn" required by ThemeManager.js -->
+          <button id="fm-settings-btn" class="settings-btn" type="button" aria-label="Open settings">
+            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M12 8.35a3.65 3.65 0 1 0 0 7.3 3.65 3.65 0 0 0 0-7.3Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M19.2 13.35v-2.7l-2.18-.42a5.68 5.68 0 0 0-.58-1.4l1.24-1.82-1.9-1.9-1.82 1.24c-.44-.24-.91-.44-1.4-.58L12.15 3h-2.7l-.42 2.18c-.49.14-.96.34-1.4.58L5.8 4.52l-1.9 1.9 1.24 1.82c-.24.44-.44.91-.58 1.4L2.4 10.05v2.7l2.16.42c.14.5.34.97.58 1.41L3.9 16.4l1.9 1.9 1.82-1.24c.44.24.91.43 1.4.58l.42 2.16h2.7l.42-2.16c.49-.15.96-.34 1.4-.58l1.82 1.24 1.9-1.9-1.24-1.82c.24-.44.44-.91.58-1.41l2.18-.42Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </section>
+      </nav>
 
-    <!-- Study Desk Items Strip -->
-    <div id="fm-stats-strip" class="study-strip">
-      <!-- Timetable Card -->
-      <div class="desk-item timetable-card">
-        <div class="tape-strip"></div>
-        <span class="desk-item-icon">📅</span>
-        <div class="desk-item-content">
-          <span class="desk-item-val" id="stat-timetable-val">CS / Maths</span>
-          <span class="desk-item-lbl">Today's Class</span>
-        </div>
-      </div>
-      <!-- Sticky Note -->
-      <div class="desk-item sticky-note stats-recent">
-        <div class="tape-strip"></div>
-        <span class="desk-item-icon">⚡</span>
-        <div class="desk-item-content">
-          <span class="desk-item-val" id="stat-recent-val">0</span>
-          <span class="desk-item-lbl">Recent Notes</span>
-        </div>
-      </div>
-      <!-- Binder index card -->
-      <div class="desk-item index-card stats-notebooks">
-        <div class="paperclip-shape"></div>
-        <span class="desk-item-icon">📚</span>
-        <div class="desk-item-content">
-          <span class="desk-item-val" id="stat-total-val">0</span>
-          <span class="desk-item-lbl">Binder Books</span>
-        </div>
-      </div>
-      <!-- Loose paper slip -->
-      <div class="desk-item paper-slip stats-lined">
-        <span class="desk-item-icon">📝</span>
-        <div class="desk-item-content">
-          <span class="desk-item-val" id="stat-lined-val">0</span>
-          <span class="desk-item-lbl">Study Pages</span>
-        </div>
-      </div>
-    </div>
+      <section class="stats-row" aria-label="Notebook overview">
+        <article class="stat-card stat-card-wide">
+          <span class="stat-label">TODAY'S CLASS</span>
+          <!-- id="stat-timetable-val" updated dynamically by FileManagerView.js -->
+          <strong id="stat-timetable-val">Software Eng</strong>
+        </article>
+        <article class="stat-card">
+          <strong id="stat-recent-val">0</strong>
+          <span class="stat-label">Recent Notes</span>
+        </article>
+        <article class="stat-card">
+          <strong id="stat-total-val">0</strong>
+          <span class="stat-label">Binder Books</span>
+        </article>
+        <article class="stat-card">
+          <strong id="stat-lined-val">0</strong>
+          <span class="stat-label">Study Pages</span>
+        </article>
+      </section>
 
-    <!-- Filter tabs styled as notebook index tabs -->
-    <div id="fm-filters-wrapper">
-      <div id="fm-filters" class="binder-tabs">
-        <button class="filter-tab active" data-filter="all">All Notes</button>
-        <button class="filter-tab" data-filter="recent">Recent</button>
-        <button class="filter-tab" data-filter="lined">Lined Paper</button>
-        <button class="filter-tab" data-filter="blank">Blank Paper</button>
-      </div>
-    </div>
+      <section class="tabs" aria-label="Notebook filters">
+        <!-- filter-tab class + data-filter attribute required by FileManagerView.js -->
+        <button class="tab filter-tab is-active active" type="button" data-tab="all" data-filter="all" aria-selected="true">All Notes</button>
+        <button class="tab filter-tab" type="button" data-tab="recent" data-filter="recent" aria-selected="false">Recent</button>
+        <button class="tab filter-tab" type="button" data-tab="lined" data-filter="lined" aria-selected="false">Lined Paper</button>
+        <button class="tab filter-tab" type="button" data-tab="blank" data-filter="blank" aria-selected="false">Blank Paper</button>
+      </section>
 
-    <!-- Notebook shelf desk mat area -->
-    <div class="desk-mat">
-      <div class="shelf-header">
-        <span class="shelf-label-icon">📂</span>
-        <h2>My Notebook Shelf</h2>
-        <span class="shelf-sub">Pick a subject book to open on the desk.</span>
-      </div>
-      <!-- Notebook cards rendered here by FileManagerView.render() -->
-      <div id="notebook-grid" class="notebook-shelf"></div>
-    </div>
-
+      <section class="shelf-panel" aria-label="Notebook shelf">
+        <div class="shelf-rule" aria-hidden="true"></div>
+        <!-- #notebook-grid: FileManagerView renders notebook cards and empty state here -->
+        <div id="notebook-grid" class="notebook-shelf"></div>
+      </section>
+    </main>
   </div>
 
 
@@ -336,11 +330,11 @@
         <h2>Workspace Settings</h2>
         <button id="settings-close" class="settings-close-btn" aria-label="Close settings">&times;</button>
       </div>
-      
+
       <div class="settings-section">
         <label class="settings-section-lbl">Appearance Theme</label>
         <p class="settings-section-desc">Choose a design mood for your classroom notebooks.</p>
-        
+
         <div class="theme-options">
           <div class="theme-option-card" data-value="light">
             <span class="theme-icon">☀️</span>
@@ -349,7 +343,7 @@
               <span class="theme-desc">Bright school notebook workspace</span>
             </div>
           </div>
-          
+
           <div class="theme-option-card" data-value="dark">
             <span class="theme-icon">🌙</span>
             <div class="theme-text">
@@ -357,7 +351,7 @@
               <span class="theme-desc">Late-night study desk mode</span>
             </div>
           </div>
-          
+
           <div class="theme-option-card" data-value="system">
             <span class="theme-icon">💻</span>
             <div class="theme-text">
@@ -371,7 +365,7 @@
       <div class="settings-section" style="margin-top: 24px; border-top: 1.5px dashed var(--border-strong); padding-top: 16px;">
         <label class="settings-section-lbl">Page Appearance</label>
         <p class="settings-section-desc">Select the default notebook paper theme.</p>
-        
+
         <div class="page-theme-options">
           <div class="page-theme-option-card" data-value="light">
             <span class="theme-icon">📄</span>
@@ -380,7 +374,7 @@
               <span class="theme-desc">Classic cream notebook paper</span>
             </div>
           </div>
-          
+
           <div class="page-theme-option-card" data-value="dark">
             <span class="theme-icon">📓</span>
             <div class="theme-text">
@@ -388,7 +382,7 @@
               <span class="theme-desc">Dark study paper for night notes</span>
             </div>
           </div>
-          
+
           <div class="page-theme-option-card" data-value="system">
             <span class="theme-icon">🔄</span>
             <div class="theme-text">
@@ -399,7 +393,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- #settings-modal -->
 
 </body>
 </html>
