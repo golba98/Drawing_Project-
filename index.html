@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook Drawing App</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- p5.js pinned to 1.9.4 for stable erase() API -->
+  <script defer src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+
+  <!-- App state and storage first -->
+  <script defer src="app/AppState.js"></script>
+  <script defer src="app/StorageManager.js"></script>
+
+  <!-- p5 helpers -->
+  <script defer src="ui/PageBackground.js"></script>
+
+  <!-- Tool classes before Toolbox (Toolbox instantiates them in its constructor) -->
+  <script defer src="tools/PenTool.js"></script>
+  <script defer src="tools/HighlighterTool.js"></script>
+  <script defer src="tools/EraserTool.js"></script>
+  <script defer src="tools/LineTool.js"></script>
+  <script defer src="tools/SprayTool.js"></script>
+  <script defer src="tools/Toolbox.js"></script>
+
+  <!-- View controllers after tools (their event handlers reference toolbox global) -->
+  <script defer src="app/FileManagerView.js"></script>
+  <script defer src="app/EditorView.js"></script>
+
+  <!-- sketch.js last — defines setup/draw and calls view inits -->
+  <script defer src="sketch.js"></script>
+</head>
+<body>
+
+  <!-- ═══ View 1: File Manager ═══════════════════════════════════════════════ -->
+  <div id="file-manager-view">
+
+    <header id="fm-header">
+      <h1>Notebook Drawing App</h1>
+      <button id="new-notebook-btn" aria-label="Create new notebook">
+        <img src="assets/icons/new-file.svg" alt="">
+        New Notebook
+      </button>
+    </header>
+
+    <!-- Notebook cards rendered here by FileManagerView.render() -->
+    <div id="notebook-grid"></div>
+
+  </div>
+
+  <!-- ═══ View 2: Editor ════════════════════════════════════════════════════ -->
+  <div id="editor-view" class="hidden">
+
+    <!-- Top header: back button + notebook title -->
+    <div id="editor-header">
+      <button id="editor-back-btn" aria-label="Back to library">
+        <img src="assets/icons/back.svg" alt="Back">
+      </button>
+      <span id="editor-title"></span>
+    </div>
+
+    <!-- Body: left toolbar + canvas area -->
+    <div id="editor-body">
+
+      <!-- Left toolbar with drawing tools, page modes, and actions -->
+      <div id="editor-toolbar" role="toolbar" aria-label="Drawing tools">
+
+        <!-- Drawing tools -->
+        <button class="tool-btn active" data-tool="pen"         title="Pen"         aria-label="Pen tool">
+          <img src="assets/icons/pen.svg" alt="Pen">
+        </button>
+        <button class="tool-btn"        data-tool="highlighter" title="Highlighter" aria-label="Highlighter tool">
+          <img src="assets/icons/highlighter.svg" alt="Highlighter">
+        </button>
+        <button class="tool-btn"        data-tool="eraser"      title="Eraser"      aria-label="Eraser tool">
+          <img src="assets/icons/eraser.svg" alt="Eraser">
+        </button>
+        <button class="tool-btn"        data-tool="line"        title="Line"        aria-label="Line tool">
+          <img src="assets/icons/line.svg" alt="Line">
+        </button>
+        <button class="tool-btn"        data-tool="spray"       title="Spray"       aria-label="Spray tool">
+          <img src="assets/icons/spray.svg" alt="Spray">
+        </button>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Page background mode -->
+        <button class="page-btn" data-page="blank" title="Blank page" aria-label="Blank page">
+          <img src="assets/icons/blank-page.svg" alt="Blank page">
+        </button>
+        <button class="page-btn active" data-page="lined" title="Lined page" aria-label="Lined page">
+          <img src="assets/icons/lined-page.svg" alt="Lined page">
+        </button>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- Actions -->
+        <button class="action-btn" data-action="clear" title="Clear drawing" aria-label="Clear drawing">
+          <img src="assets/icons/clear.svg" alt="Clear">
+        </button>
+        <button class="action-btn" data-action="save"  title="Save as PNG"  aria-label="Save as PNG">
+          <img src="assets/icons/save.svg" alt="Save">
+        </button>
+
+      </div><!-- #editor-toolbar -->
+
+      <!-- p5 canvas is injected here by sketch.js setup() via cnv.parent('canvas-container') -->
+      <div id="canvas-container"></div>
+
+    </div><!-- #editor-body -->
+
+    <!-- Bottom controls: colour picker + stroke size -->
+    <div id="editor-controls">
+      <label for="colorPicker">Color</label>
+      <input type="color" id="colorPicker" value="#000000" title="Stroke colour">
+      <label for="strokeSize">Size</label>
+      <input type="range" id="strokeSize" min="1" max="40" value="4" title="Stroke size">
+      <span id="sizeLabel">4px</span>
+    </div>
+
+  </div><!-- #editor-view -->
+
+  <!-- ═══ New Notebook Modal ═════════════════════════════════════════════════ -->
+  <div id="new-notebook-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Create new notebook">
+    <div class="modal-box">
+
+      <h2>New Notebook</h2>
+
+      <label for="notebook-title-input">Name</label>
+      <input type="text" id="notebook-title-input" value="Untitled Notebook"
+             maxlength="80" autocomplete="off" spellcheck="false">
+
+      <label>Page Style</label>
+      <div class="page-style-options">
+        <label>
+          <input type="radio" id="page-mode-lined" name="pageMode" value="lined" checked>
+          Lined
+        </label>
+        <label>
+          <input type="radio" id="page-mode-blank" name="pageMode" value="blank">
+          Blank
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modal-cancel">Cancel</button>
+        <button id="modal-create" class="btn-primary">Create</button>
+      </div>
+
+    </div>
+  </div><!-- #new-notebook-modal -->
+
+</body>
+</html>

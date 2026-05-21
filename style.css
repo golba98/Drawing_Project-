@@ -1,0 +1,580 @@
+/* style.css — GoodNotes-style Notebook Drawing App */
+
+/* ─── Reset & Base ────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #e8e2d6;
+  color: #2d2d2d;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ─── File Manager View ───────────────────────────────────────────────────── */
+
+#file-manager-view {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f0ece3;
+  overflow-y: auto;
+}
+
+/* Header */
+#fm-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  background: #f5f1e8;
+  border-bottom: 1px solid #ddd6c8;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+
+#fm-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2a2a2a;
+  letter-spacing: -0.3px;
+}
+
+#new-notebook-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: #4a8c6f;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+#new-notebook-btn:hover {
+  background: #3d7860;
+}
+
+#new-notebook-btn:active {
+  transform: scale(0.97);
+}
+
+#new-notebook-btn img {
+  width: 16px;
+  height: 16px;
+  filter: invert(1); /* make dark icon white */
+}
+
+/* Notebook Grid */
+#notebook-grid {
+  padding: 28px 32px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 24px;
+  align-content: start;
+}
+
+/* Notebook Card */
+.notebook-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.notebook-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* Card Preview — visual thumbnail of page style */
+.card-preview {
+  height: 130px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-preview.blank {
+  background: #fdf9ef;
+}
+
+.card-preview.lined {
+  background: #fdf9ef;
+  /* Simulate ruled lines using repeating gradient */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 26px,
+    rgba(160, 190, 210, 0.45) 26px,
+    rgba(160, 190, 210, 0.45) 27px
+  );
+  background-position: 0 28px;
+}
+
+.card-preview.lined::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(210, 140, 140, 0.5);
+}
+
+/* Drawing thumbnail overlay on card preview */
+.card-thumbnail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+/* Card Info */
+.card-info {
+  padding: 12px 14px 10px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-mode-badge {
+  background: #ede8df;
+  color: #666;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.notebook-card:hover .card-actions {
+  opacity: 1;
+}
+
+.card-action-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: #f0ece3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: background 0.12s;
+}
+
+.card-action-btn:hover {
+  background: #e0dbd0;
+}
+
+.card-action-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  color: #aaa;
+}
+
+.empty-icon {
+  width: 72px;
+  height: 72px;
+  opacity: 0.25;
+  margin-bottom: 20px;
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-size: 14px;
+  color: #bbb;
+}
+
+.empty-sub strong {
+  color: #999;
+}
+
+/* ─── New Notebook Modal ─────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px 36px 28px;
+  width: 380px;
+  max-width: 92vw;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+}
+
+.modal-box h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 22px;
+  color: #1a1a1a;
+}
+
+.modal-box label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  margin-top: 18px;
+}
+
+.modal-box label:first-of-type {
+  margin-top: 0;
+}
+
+.modal-box input[type="text"] {
+  width: 100%;
+  padding: 10px 13px;
+  font-size: 15px;
+  border: 1.5px solid #ddd;
+  border-radius: 9px;
+  outline: none;
+  color: #1a1a1a;
+  background: #fafafa;
+  transition: border-color 0.15s;
+  user-select: text;
+}
+
+.modal-box input[type="text"]:focus {
+  border-color: #4a8c6f;
+}
+
+/* Page style radio group — styled as pill toggles */
+.page-style-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.page-style-options label {
+  margin: 0;
+  flex: 1;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.page-style-options input[type="radio"] {
+  accent-color: #4a8c6f;
+}
+
+.page-style-options label:has(input:checked) {
+  border-color: #4a8c6f;
+  background: #edf6f1;
+  color: #2d6650;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid #ddd;
+  background: #f5f5f5;
+  color: #444;
+  transition: background 0.12s;
+}
+
+.modal-actions button:hover {
+  background: #ebebeb;
+}
+
+.btn-primary {
+  background: #4a8c6f !important;
+  color: #fff !important;
+  border-color: #4a8c6f !important;
+}
+
+.btn-primary:hover {
+  background: #3d7860 !important;
+}
+
+/* ─── Editor View ─────────────────────────────────────────────────────────── */
+
+#editor-view {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: #e0dbd0;
+}
+
+/* Editor Header */
+#editor-header {
+  height: 50px;
+  background: #f5f1e8;
+  border-bottom: 1px solid #ddd6c8;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+#editor-back-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+
+#editor-back-btn:hover {
+  background: #e8e3d8;
+}
+
+#editor-back-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+#editor-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2a2a2a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Editor Body (toolbar + canvas) */
+#editor-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0; /* required for flex child to scroll correctly */
+}
+
+/* Left Toolbar */
+#editor-toolbar {
+  width: 60px;
+  background: #f5f1e8;
+  border-right: 1px solid #ddd6c8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+#editor-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Canvas Container */
+#canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* p5 injects <canvas> as a child of #canvas-container */
+#canvas-container canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Editor Controls Bar */
+#editor-controls {
+  height: 56px;
+  background: #f5f1e8;
+  border-top: 1px solid #ddd6c8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+#editor-controls label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+#editor-controls input[type="color"] {
+  width: 34px;
+  height: 28px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 2px;
+  background: #fff;
+}
+
+#editor-controls input[type="range"] {
+  width: 100px;
+  height: 4px;
+  accent-color: #4a8c6f;
+  cursor: pointer;
+}
+
+#sizeLabel {
+  font-size: 11px;
+  color: #999;
+  min-width: 28px;
+}
+
+/* ─── Toolbar Buttons (shared by editor toolbar) ─────────────────────────── */
+
+.tool-btn,
+.page-btn,
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  transition: background 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+}
+
+.tool-btn:hover,
+.page-btn:hover,
+.action-btn:hover {
+  background: #e6e1d6;
+}
+
+.tool-btn.active,
+.page-btn.active {
+  border-color: #4a8c6f;
+  background: #daeee6;
+}
+
+.action-btn:active {
+  background: #ddd8ce;
+}
+
+.tool-btn img,
+.page-btn img,
+.action-btn img {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.toolbar-divider {
+  width: 36px;
+  height: 1px;
+  background: #d8d2c8;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
