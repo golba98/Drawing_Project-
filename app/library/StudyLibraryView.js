@@ -1,8 +1,6 @@
 // app/library/StudyLibraryView.js
-// Visual and UX Controller for the clean UOL Study Library rebuild.
 
 const state = {
-  selectedYearId: "year-1",
   selectedSemesterId: "semester-1",
   selectedSubjectId: null,
   selectedTopicId: null,
@@ -15,10 +13,16 @@ const state = {
 const StudyLibraryView = {
   _container: null,
   _contentWrapper: null,
+  _searchInput: null,
+  _initialized: false,
 
   init() {
+    if (this._initialized) return;
+    this._initialized = true;
+
     this._container = document.getElementById('file-manager-view');
     this._contentWrapper = document.getElementById('study-library-content');
+    this._searchInput = document.getElementById('study-search');
 
     if (!this._container || !this._contentWrapper) {
       console.error("Study Library view containers not found in index.html!");
@@ -31,34 +35,23 @@ const StudyLibraryView = {
   },
 
   show() {
-    if (this._container) {
-      this._container.classList.remove('hidden');
-    }
-    // Sync UI view mode on show
-    state.viewMode = state.selectedSubjectId 
+    if (this._container) this._container.classList.remove('hidden');
+    state.viewMode = state.selectedSubjectId
       ? (state.selectedTopicId ? "topic" : "subject")
       : "semester";
     this.render();
   },
 
   hide() {
-    if (this._container) {
-      this._container.classList.add('hidden');
-    }
+    if (this._container) this._container.classList.add('hidden');
   },
 
-  // State navigations
   selectSemester(semId) {
     state.selectedSemesterId = semId;
     state.selectedSubjectId = null;
     state.selectedTopicId = null;
     state.viewMode = "semester";
-    state.searchQuery = ""; // Reset search
-    
-    // Clear search input box
-    const searchInput = document.getElementById('study-search');
-    if (searchInput) searchInput.value = "";
-
+    this._clearSearch();
     this._syncSidebarSemester();
     this.render();
   },
@@ -73,12 +66,7 @@ const StudyLibraryView = {
     state.selectedSubjectId = subjectId;
     state.selectedTopicId = null;
     state.viewMode = "subject";
-    state.searchQuery = ""; // Reset search
-    
-    // Clear search input box
-    const searchInput = document.getElementById('study-search');
-    if (searchInput) searchInput.value = "";
-
+    this._clearSearch();
     this.render();
   },
 
@@ -93,22 +81,14 @@ const StudyLibraryView = {
     state.selectedSubjectId = null;
     state.selectedTopicId = null;
     state.viewMode = "semester";
-    state.searchQuery = ""; // Reset search
-
-    const searchInput = document.getElementById('study-search');
-    if (searchInput) searchInput.value = "";
-
+    this._clearSearch();
     this.render();
   },
 
   goBackToSubject() {
     state.selectedTopicId = null;
     state.viewMode = "subject";
-    state.searchQuery = ""; // Reset search
-
-    const searchInput = document.getElementById('study-search');
-    if (searchInput) searchInput.value = "";
-
+    this._clearSearch();
     this.render();
   },
 
@@ -117,8 +97,7 @@ const StudyLibraryView = {
     if (!mod) return;
     const currentIndex = mod.topics.indexOf(state.selectedTopicId);
     if (currentIndex === -1) return;
-
-    let targetIndex = currentIndex + direction;
+    const targetIndex = currentIndex + direction;
     if (targetIndex >= 0 && targetIndex < mod.topics.length) {
       state.selectedTopicId = mod.topics[targetIndex];
       state.activeTopicTab = "overview";
@@ -132,50 +111,24 @@ const StudyLibraryView = {
     this._syncTabButtons();
   },
 
-  // Event wiring using stable root event delegation
   _wireEvents() {
     this._container.addEventListener('click', (e) => {
       const actionEl = e.target.closest('[data-action]');
       if (!actionEl) return;
 
       const action = actionEl.dataset.action;
-
-      // Print debug logs temporarily during development as required
-      console.log(`[StudyLibrary Action] ${action}`, {
-        dataset: actionEl.dataset,
-        currentState: { ...state }
-      });
-
       e.preventDefault();
 
       switch (action) {
-        case "select-semester":
-          this.selectSemester(actionEl.dataset.semesterId);
-          break;
-        case "set-filter":
-          this.setFilter(actionEl.dataset.filter);
-          break;
-        case "open-subject":
-          this.openSubject(actionEl.dataset.subjectId);
-          break;
-        case "open-topic":
-          this.openTopic(actionEl.dataset.topicId);
-          break;
-        case "back-to-semester":
-          this.goBackToSemester();
-          break;
-        case "back-to-subject":
-          this.goBackToSubject();
-          break;
-        case "previous-topic":
-          this.navigateTopic(-1);
-          break;
-        case "next-topic":
-          this.navigateTopic(1);
-          break;
-        case "set-tab":
-          this.setTab(actionEl.dataset.tab);
-          break;
+        case "select-semester":  this.selectSemester(actionEl.dataset.semesterId); break;
+        case "set-filter":       this.setFilter(actionEl.dataset.filter); break;
+        case "open-subject":     this.openSubject(actionEl.dataset.subjectId); break;
+        case "open-topic":       this.openTopic(actionEl.dataset.topicId); break;
+        case "back-to-semester": this.goBackToSemester(); break;
+        case "back-to-subject":  this.goBackToSubject(); break;
+        case "previous-topic":   this.navigateTopic(-1); break;
+        case "next-topic":       this.navigateTopic(1); break;
+        case "set-tab":          this.setTab(actionEl.dataset.tab); break;
         case "new-subject":
         case "more-actions":
         case "settings":
@@ -192,24 +145,16 @@ const StudyLibraryView = {
     });
 
     this._container.addEventListener('input', (e) => {
-      const searchInput = e.target.closest('#study-search');
-      if (searchInput) {
-        state.searchQuery = searchInput.value.toLowerCase().trim();
-        
-        console.log(`[StudyLibrary Search] Query: "${state.searchQuery}"`);
-        this.render();
-      }
+      if (!e.target.closest('#study-search')) return;
+      state.searchQuery = e.target.value.toLowerCase().trim();
+      this.render();
     });
   },
 
-  // Synchronizers to sync structural state to view representation
   _syncSidebarSemester() {
-    const semButtons = this._container.querySelectorAll('.semester-btn');
-    semButtons.forEach(btn => {
-      // Remove any prior dots
+    this._container.querySelectorAll('.semester-btn').forEach(btn => {
       const dot = btn.querySelector('.nav-dot');
       if (dot) dot.remove();
-
       if (btn.dataset.semesterId === state.selectedSemesterId) {
         btn.classList.add('active');
         btn.insertAdjacentHTML('beforeend', '<span class="nav-dot"></span>');
@@ -220,58 +165,34 @@ const StudyLibraryView = {
   },
 
   _syncSidebarFilter() {
-    const filterButtons = this._container.querySelectorAll('.quick-filter-btn');
-    filterButtons.forEach(btn => {
-      if (btn.dataset.filter === state.activeFilter) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+    this._container.querySelectorAll('.quick-filter-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === state.activeFilter);
     });
   },
 
   _syncTabButtons() {
-    const tabButtons = this._container.querySelectorAll('.workspace-tab');
-    tabButtons.forEach(btn => {
-      if (btn.dataset.tab === state.activeTopicTab) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+    this._container.querySelectorAll('.workspace-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === state.activeTopicTab);
     });
   },
 
-  // Main rendering flow based on view state
   render() {
-    // Print current state in terminal console for debugging as required
-    console.log(`[StudyLibrary Render] State:`, { ...state });
-
-    // Sync input placeholder based on view mode
-    const searchInput = document.getElementById("study-search");
-    if (searchInput) {
-      if (state.viewMode === "topic") {
-        searchInput.placeholder = "Search applies to modules and topics...";
-      } else {
-        searchInput.placeholder = "Search modules, topics, notes, resources...";
-      }
+    if (this._searchInput) {
+      this._searchInput.placeholder = state.viewMode === "topic"
+        ? "Search applies to modules and topics..."
+        : "Search modules, topics, notes, resources...";
     }
-
-    // Always scroll back to top of content on view transitions
     this._contentWrapper.scrollTop = 0;
 
-    if (state.viewMode === "semester") {
-      this._renderSemesterView();
-    } else if (state.viewMode === "subject") {
-      this._renderSubjectView();
-    } else if (state.viewMode === "topic") {
-      this._renderTopicView();
-    }
+    if (state.viewMode === "semester")     this._renderSemesterView();
+    else if (state.viewMode === "subject") this._renderSubjectView();
+    else if (state.viewMode === "topic")   this._renderTopicView();
   },
 
-  // ─── RENDERING HELPERS ─────────────────────────────────────────────────────
+  // ─── RENDERING ─────────────────────────────────────────────────────────────
 
   _renderSemesterView() {
-    const semIndex = parseInt(state.selectedSemesterId.replace("semester-", ""));
+    const semIndex = this._getSemesterIndex();
     const semData = LibrarySeedData.semesters.find(s => s.id === semIndex);
     if (!semData) return;
 
@@ -297,7 +218,6 @@ const StudyLibraryView = {
       return;
     }
 
-    // Warm academic palette — no blue/purple
     const accentColors = {
       'intro-to-programming':             '#C8952A',
       'computational-mathematics':        '#A0522D',
@@ -310,24 +230,24 @@ const StudyLibraryView = {
     };
 
     const folderIcon = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4h3.17a1.5 1.5 0 0 1 1.06.44l.83.83A1.5 1.5 0 0 0 9.62 5.75H14.5A1.5 1.5 0 0 1 16 7.25v6.25A1.5 1.5 0 0 1 14.5 15h-11A1.5 1.5 0 0 1 2 13.5z"/></svg>`;
-    const shelfIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="5" y1="9" x2="5" y2="13"/></svg>`;
+    const shelfIcon  = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="5" y1="9" x2="5" y2="13"/></svg>`;
 
-    let cardsHtml = "";
-    filteredModules.forEach((mod, i) => {
-      const stats = LibrarySeedData.getModuleStats(mod);
+    const cardsHtml = filteredModules.map((mod, i) => {
+      const stats  = LibrarySeedData.getModuleStats(mod);
       const accent = accentColors[mod.id] || '#C8952A';
-      const delay = (i * 0.06).toFixed(2);
+      const rgb    = this._hexToRgb(accent);
+      const delay  = (i * 0.06).toFixed(2);
 
       const pills = [];
-      if (stats.lectures > 0) pills.push(`<span class="type-pill"><strong>${stats.lectures}</strong> Lectures</span>`);
-      if (stats.assessments > 0) pills.push(`<span class="type-pill"><strong>${stats.assessments}</strong> Assessment${stats.assessments > 1 ? 's' : ''}</span>`);
-      if (stats.exams > 0) pills.push(`<span class="type-pill"><strong>${stats.exams}</strong> Exam${stats.exams > 1 ? 's' : ''}</span>`);
-      if (stats.projects > 0) pills.push(`<span class="type-pill"><strong>${stats.projects}</strong> Project${stats.projects > 1 ? 's' : ''}</span>`);
+      if (stats.lectures > 0)    pills.push(`<span class="type-pill"><strong>${stats.lectures}</strong> Lecture${stats.lectures !== 1 ? 's' : ''}</span>`);
+      if (stats.assessments > 0) pills.push(`<span class="type-pill"><strong>${stats.assessments}</strong> Assessment${stats.assessments !== 1 ? 's' : ''}</span>`);
+      if (stats.exams > 0)       pills.push(`<span class="type-pill"><strong>${stats.exams}</strong> Exam${stats.exams !== 1 ? 's' : ''}</span>`);
+      if (stats.projects > 0)    pills.push(`<span class="type-pill"><strong>${stats.projects}</strong> Project${stats.projects !== 1 ? 's' : ''}</span>`);
 
-      cardsHtml += `
+      return `
         <div class="module-folder-card animate-fade" data-action="open-subject" data-subject-id="${mod.id}" style="--card-accent:${accent}; animation-delay:${delay}s;">
           <div class="folder-card-top">
-            <div class="folder-icon-wrap" style="background:rgba(${this._hexToRgb(accent)},0.12); border-color:rgba(${this._hexToRgb(accent)},0.25); color:${accent};">
+            <div class="folder-icon-wrap" style="background:rgba(${rgb},0.12); border-color:rgba(${rgb},0.25); color:${accent};">
               ${folderIcon}
             </div>
             <div class="folder-card-info">
@@ -337,12 +257,11 @@ const StudyLibraryView = {
           </div>
           <div class="module-type-breakdown">${pills.join('')}</div>
           <button class="btn btn-ghost open-folder-btn" data-action="open-subject" data-subject-id="${mod.id}">
-            Open Folder
-            <span>→</span>
+            Open Folder <span>→</span>
           </button>
         </div>
       `;
-    });
+    }).join('');
 
     this._contentWrapper.innerHTML = `
       <div class="view-header">
@@ -365,26 +284,32 @@ const StudyLibraryView = {
     const mod = this._getActiveModule();
     if (!mod) return;
 
+    const semIndex = this._getSemesterIndex();
+
     let filteredTopics = mod.topics;
     if (state.searchQuery) {
       filteredTopics = filteredTopics.filter(t => t.toLowerCase().includes(state.searchQuery));
     }
 
-    const semIndex = parseInt(state.selectedSemesterId.replace("semester-", ""));
-    const allStats = LibrarySeedData.getModuleStats(mod);
-
-    // Group filtered topics by type
+    // Build index map and group topics in one pass — avoids double-classification
+    const topicIndexMap = new Map(mod.topics.map((t, i) => [t, i]));
     const groups = { lecture: [], assessment: [], exam: [], project: [] };
     filteredTopics.forEach(topic => {
-      const type = LibrarySeedData.classifyTopic(topic);
-      groups[type].push(topic);
+      groups[LibrarySeedData.classifyTopic(topic)].push(topic);
     });
 
+    const allStats = {
+      lectures:    groups.lecture.length,
+      assessments: groups.assessment.length,
+      exams:       groups.exam.length,
+      projects:    groups.project.length
+    };
+
     const groupDefs = [
-      { key: "lecture",    label: "Lecture Topics",  badgeClass: "badge-lecture",    icon: "📖" },
-      { key: "assessment", label: "Assessments",      badgeClass: "badge-assessment", icon: "📋" },
-      { key: "exam",       label: "Exams",             badgeClass: "badge-exam",       icon: "📝" },
-      { key: "project",    label: "Projects",          badgeClass: "badge-project",    icon: "🗂" }
+      { key: "lecture",    label: "Lecture Topics", badgeClass: "badge-lecture",    icon: "📖" },
+      { key: "assessment", label: "Assessments",     badgeClass: "badge-assessment", icon: "📋" },
+      { key: "exam",       label: "Exams",            badgeClass: "badge-exam",       icon: "📝" },
+      { key: "project",    label: "Projects",         badgeClass: "badge-project",    icon: "🗂" }
     ];
 
     let groupsHtml = "";
@@ -396,47 +321,42 @@ const StudyLibraryView = {
         </div>
       `;
     } else {
-      groupDefs.forEach(({ key, label, badgeClass, icon }) => {
+      groupsHtml = groupDefs.map(({ key, label, badgeClass, icon }) => {
         const items = groups[key];
-        if (items.length === 0) return;
-        const typeLabel = key.charAt(0).toUpperCase() + key.slice(1);
+        if (items.length === 0) return "";
+        const typeLabel = this._capitalize(key);
 
-        let cardsHtml = `<div class="topics-grid">`;
-        items.forEach(topic => {
-          const index = mod.topics.indexOf(topic);
-          cardsHtml += `
-            <div class="topic-card" data-action="open-topic" data-topic-id="${this._escapeHtml(topic)}">
-              <div class="topic-card-header">
-                <span class="topic-index">#${index + 1}</span>
-                <span class="topic-badge ${badgeClass}">${typeLabel}</span>
-              </div>
-              <h4 class="topic-title">${this._escapeHtml(topic)}</h4>
-              <div class="topic-card-footer">
-                <span class="status-badge status-todo">Not Started</span>
-                <span class="topic-arrow">→</span>
-              </div>
+        const cardsHtml = items.map(topic => `
+          <div class="topic-card" data-action="open-topic" data-topic-id="${this._escapeHtml(topic)}">
+            <div class="topic-card-header">
+              <span class="topic-index">#${topicIndexMap.get(topic) + 1}</span>
+              <span class="topic-badge ${badgeClass}">${typeLabel}</span>
             </div>
-          `;
-        });
-        cardsHtml += `</div>`;
+            <h4 class="topic-title">${this._escapeHtml(topic)}</h4>
+            <div class="topic-card-footer">
+              <span class="status-badge status-todo">Not Started</span>
+              <span class="topic-arrow">→</span>
+            </div>
+          </div>
+        `).join('');
 
-        groupsHtml += `
+        return `
           <div class="topic-group">
             <div class="topic-group-header">
               <span class="topic-group-label">${icon} ${label}</span>
               <span class="topic-group-count">${items.length}</span>
             </div>
-            ${cardsHtml}
+            <div class="topics-grid">${cardsHtml}</div>
           </div>
         `;
-      });
+      }).join('');
     }
 
     const stripParts = [];
-    if (allStats.lectures > 0) stripParts.push(`${allStats.lectures} Lectures`);
-    if (allStats.assessments > 0) stripParts.push(`${allStats.assessments} Assessment${allStats.assessments > 1 ? 's' : ''}`);
-    if (allStats.exams > 0) stripParts.push(`${allStats.exams} Exam${allStats.exams > 1 ? 's' : ''}`);
-    if (allStats.projects > 0) stripParts.push(`${allStats.projects} Project${allStats.projects > 1 ? 's' : ''}`);
+    if (allStats.lectures > 0)    stripParts.push(`${allStats.lectures} Lecture${allStats.lectures !== 1 ? 's' : ''}`);
+    if (allStats.assessments > 0) stripParts.push(`${allStats.assessments} Assessment${allStats.assessments !== 1 ? 's' : ''}`);
+    if (allStats.exams > 0)       stripParts.push(`${allStats.exams} Exam${allStats.exams !== 1 ? 's' : ''}`);
+    if (allStats.projects > 0)    stripParts.push(`${allStats.projects} Project${allStats.projects !== 1 ? 's' : ''}`);
 
     this._contentWrapper.innerHTML = `
       <div class="subject-header-area">
@@ -449,8 +369,7 @@ const StudyLibraryView = {
       </div>
       <div class="subject-info-strip">
         <span>${mod.topics.length} Topics</span>
-        <span style="color:var(--border2);">·</span>
-        ${stripParts.join('<span style="color:var(--border2);">·</span>')}
+        ${stripParts.map(p => `<span class="strip-sep">·</span><span>${p}</span>`).join('')}
       </div>
       <div class="subject-workspace">${groupsHtml}</div>
     `;
@@ -460,35 +379,21 @@ const StudyLibraryView = {
     const mod = this._getActiveModule();
     if (!mod) return;
 
-    const topic = state.selectedTopicId;
-    const type = LibrarySeedData.classifyTopic(topic);
-    const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-    
-    let typeBadgeClass = "badge-lecture";
-    if (type === "exam") typeBadgeClass = "badge-exam";
-    else if (type === "assessment") typeBadgeClass = "badge-assessment";
-    else if (type === "project") typeBadgeClass = "badge-project";
+    const topic        = state.selectedTopicId;
+    const type         = LibrarySeedData.classifyTopic(topic);
+    const typeBadgeClass = this._getTypeBadgeClass(type);
+    const idx          = mod.topics.indexOf(topic);
+    const hasPrev      = idx > 0;
+    const hasNext      = idx < mod.topics.length - 1;
+    const semIndex     = this._getSemesterIndex();
 
-    // Detect if previous/next are disabled
-    const idx = mod.topics.indexOf(topic);
-    const hasPrev = idx > 0;
-    const hasNext = idx < mod.topics.length - 1;
-
-    const semIndex = parseInt(state.selectedSemesterId.replace("semester-", ""));
-
-    const html = `
+    this._contentWrapper.innerHTML = `
       <div class="topic-header-area">
         <div class="topic-nav-controls">
-          <button class="btn btn-ghost back-to-subject-btn" data-action="back-to-subject">
-            ← Back to Module
-          </button>
+          <button class="btn btn-ghost back-to-subject-btn" data-action="back-to-subject">← Back to Module</button>
           <div class="nav-arrows">
-            <button class="btn btn-ghost prev-topic-btn" data-action="previous-topic" ${!hasPrev ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>
-              ◀ Previous
-            </button>
-            <button class="btn btn-ghost next-topic-btn" data-action="next-topic" ${!hasNext ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>
-              Next ▶
-            </button>
+            <button class="btn btn-ghost prev-topic-btn${!hasPrev ? ' btn-nav-disabled' : ''}" data-action="previous-topic" ${!hasPrev ? 'disabled' : ''}>◀ Previous</button>
+            <button class="btn btn-ghost next-topic-btn${!hasNext ? ' btn-nav-disabled' : ''}" data-action="next-topic" ${!hasNext ? 'disabled' : ''}>Next ▶</button>
           </div>
         </div>
 
@@ -499,7 +404,7 @@ const StudyLibraryView = {
         <div class="topic-title-row">
           <h2 class="topic-title">${this._escapeHtml(topic)}</h2>
           <div class="topic-badges">
-            <span class="topic-badge ${typeBadgeClass}">${typeLabel}</span>
+            <span class="topic-badge ${typeBadgeClass}">${this._capitalize(type)}</span>
             <span class="status-badge status-todo">Not Started</span>
           </div>
         </div>
@@ -508,50 +413,42 @@ const StudyLibraryView = {
 
       <div class="topic-workspace-tabs">
         <div class="workspace-tabs-strip">
-          <button class="workspace-tab ${state.activeTopicTab === 'overview' ? 'active' : ''}" data-action="set-tab" data-tab="overview">Overview</button>
-          <button class="workspace-tab ${state.activeTopicTab === 'notes' ? 'active' : ''}" data-action="set-tab" data-tab="notes">Notes</button>
-          <button class="workspace-tab ${state.activeTopicTab === 'files' ? 'active' : ''}" data-action="set-tab" data-tab="files">Files</button>
-          <button class="workspace-tab ${state.activeTopicTab === 'sketches' ? 'active' : ''}" data-action="set-tab" data-tab="sketches">Sketches</button>
-          <button class="workspace-tab ${state.activeTopicTab === 'tasks' ? 'active' : ''}" data-action="set-tab" data-tab="tasks">Tasks</button>
+          <button class="workspace-tab ${state.activeTopicTab === 'overview'  ? 'active' : ''}" data-action="set-tab" data-tab="overview">Overview</button>
+          <button class="workspace-tab ${state.activeTopicTab === 'notes'     ? 'active' : ''}" data-action="set-tab" data-tab="notes">Notes</button>
+          <button class="workspace-tab ${state.activeTopicTab === 'files'     ? 'active' : ''}" data-action="set-tab" data-tab="files">Files</button>
+          <button class="workspace-tab ${state.activeTopicTab === 'sketches'  ? 'active' : ''}" data-action="set-tab" data-tab="sketches">Sketches</button>
+          <button class="workspace-tab ${state.activeTopicTab === 'tasks'     ? 'active' : ''}" data-action="set-tab" data-tab="tasks">Tasks</button>
           <button class="workspace-tab ${state.activeTopicTab === 'exam-prep' ? 'active' : ''}" data-action="set-tab" data-tab="exam-prep">Exam Prep</button>
         </div>
-
-        <div class="workspace-panel" id="topic-tab-panel">
-          <!-- Injected dynamically -->
-        </div>
+        <div class="workspace-panel" id="topic-tab-panel"></div>
       </div>
     `;
 
-    this._contentWrapper.innerHTML = html;
-    this._updateTopicTabPanel();
+    this._updateTopicTabPanel(mod);
   },
 
-  _updateTopicTabPanel() {
+  _updateTopicTabPanel(mod) {
     const panel = document.getElementById('topic-tab-panel');
     if (!panel) return;
 
-    const topic = state.selectedTopicId;
-    const type = LibrarySeedData.classifyTopic(topic);
+    if (!mod) mod = this._getActiveModule();
+    const topic          = state.selectedTopicId;
+    const type           = LibrarySeedData.classifyTopic(topic);
+    const typeBadgeClass = this._getTypeBadgeClass(type);
+    const semIndex       = this._getSemesterIndex();
 
     let html = "";
 
-    switch(state.activeTopicTab) {
+    switch (state.activeTopicTab) {
       case "overview": {
-        const mod = this._getActiveModule();
-        const semIndex = parseInt(state.selectedSemesterId.replace("semester-", ""));
         const topicIndex = mod ? mod.topics.indexOf(topic) : -1;
-        const posLabel = mod ? `#${topicIndex + 1} of ${mod.topics.length}` : "—";
-        let typeBadgeClass = "badge-lecture";
-        if (type === "exam") typeBadgeClass = "badge-exam";
-        else if (type === "assessment") typeBadgeClass = "badge-assessment";
-        else if (type === "project") typeBadgeClass = "badge-project";
-
+        const posLabel   = mod ? `#${topicIndex + 1} of ${mod.topics.length}` : "—";
         html = `
           <div class="topic-overview-panel animate-fade">
             <div class="overview-meta-grid">
               <div class="overview-meta-cell">
                 <div class="overview-meta-label">Type</div>
-                <div class="overview-meta-value"><span class="topic-badge ${typeBadgeClass}">${type.charAt(0).toUpperCase() + type.slice(1)}</span></div>
+                <div class="overview-meta-value"><span class="topic-badge ${typeBadgeClass}">${this._capitalize(type)}</span></div>
               </div>
               <div class="overview-meta-cell">
                 <div class="overview-meta-label">Module</div>
@@ -567,22 +464,10 @@ const StudyLibraryView = {
               </div>
             </div>
             <div class="overview-stats-row">
-              <div class="overview-stat-box">
-                <div class="overview-stat-num">0</div>
-                <div class="overview-stat-lbl">Notes</div>
-              </div>
-              <div class="overview-stat-box">
-                <div class="overview-stat-num">0</div>
-                <div class="overview-stat-lbl">Files</div>
-              </div>
-              <div class="overview-stat-box">
-                <div class="overview-stat-num">0</div>
-                <div class="overview-stat-lbl">Sketches</div>
-              </div>
-              <div class="overview-stat-box">
-                <div class="overview-stat-num">0</div>
-                <div class="overview-stat-lbl">Tasks</div>
-              </div>
+              <div class="overview-stat-box"><div class="overview-stat-num">0</div><div class="overview-stat-lbl">Notes</div></div>
+              <div class="overview-stat-box"><div class="overview-stat-num">0</div><div class="overview-stat-lbl">Files</div></div>
+              <div class="overview-stat-box"><div class="overview-stat-num">0</div><div class="overview-stat-lbl">Sketches</div></div>
+              <div class="overview-stat-box"><div class="overview-stat-num">0</div><div class="overview-stat-lbl">Tasks</div></div>
             </div>
             <div class="overview-quick-actions">
               <button class="btn btn-ghost" data-action="add-note">+ Add Note</button>
@@ -643,23 +528,12 @@ const StudyLibraryView = {
           <div class="overview-content animate-fade">
             <h3>Exam Revision Checklist</h3>
             <p>Prepare for midterm assessments and final year exams relating to <strong>${this._escapeHtml(topic)}</strong>.</p>
-            
             <div class="revision-checklist">
-              <label class="checklist-item">
-                <input type="checkbox" disabled>
-                <span>Read lecture notes and core slides thoroughly</span>
-              </label>
-              <label class="checklist-item">
-                <input type="checkbox" disabled>
-                <span>Complete workbook practices and self-tests</span>
-              </label>
-              <label class="checklist-item">
-                <input type="checkbox" disabled>
-                <span>Mock practice past exam questions</span>
-              </label>
+              <label class="checklist-item"><input type="checkbox" disabled><span>Read lecture notes and core slides thoroughly</span></label>
+              <label class="checklist-item"><input type="checkbox" disabled><span>Complete workbook practices and self-tests</span></label>
+              <label class="checklist-item"><input type="checkbox" disabled><span>Mock practice past exam questions</span></label>
             </div>
-            
-            <div class="info-alert" style="margin-top:20px; border-left:4px solid var(--gold);">
+            <div class="info-alert">
               <strong>Review Advice:</strong> This unit is categorized as an <em>${type}</em>. Focus efforts on matching typical past-paper question formats.
             </div>
           </div>
@@ -670,61 +544,36 @@ const StudyLibraryView = {
     panel.innerHTML = html;
   },
 
-  // ─── PRIVATE UTILITIES ─────────────────────────────────────────────────────
+  // ─── UTILITIES ──────────────────────────────────────────────────────────────
 
   _getActiveModule() {
     if (!state.selectedSubjectId) return null;
-    for (let sem of LibrarySeedData.semesters) {
+    for (const sem of LibrarySeedData.semesters) {
       const found = sem.modules.find(m => m.id === state.selectedSubjectId);
       if (found) return found;
     }
     return null;
   },
 
-  _showComingSoon(action) {
-    const formatted = action.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    this._showToast(`${formatted} - Feature Coming Soon!`);
+  _clearSearch() {
+    state.searchQuery = "";
+    if (this._searchInput) this._searchInput.value = "";
   },
 
-  _showToast(message) {
-    const oldToast = document.querySelector('.toast-notification');
-    if (oldToast) oldToast.remove();
+  _getSemesterIndex() {
+    return parseInt(state.selectedSemesterId.replace("semester-", ""), 10);
+  },
 
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.textContent = message;
-    
-    // Quick inline styles for premium visual notification
-    Object.assign(toast.style, {
-      position: 'fixed',
-      bottom: '24px',
-      right: '24px',
-      background: 'var(--surface)',
-      border: '1.5px solid var(--gold)',
-      color: 'var(--gold2)',
-      padding: '12px 20px',
-      borderRadius: '8px',
-      fontFamily: "'DM Mono', monospace",
-      fontSize: '12px',
-      boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-      zIndex: '9999',
-      transition: 'opacity 0.3s ease',
-      animation: 'fadeUp 0.3s ease both'
-    });
+  _getTypeBadgeClass(type) {
+    return { exam: "badge-exam", assessment: "badge-assessment", project: "badge-project" }[type] || "badge-lecture";
+  },
 
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
+  _capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   },
 
   _hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `${r},${g},${b}`;
+    return `${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)}`;
   },
 
   _escapeHtml(str) {
@@ -734,5 +583,27 @@ const StudyLibraryView = {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  },
+
+  _showComingSoon(action) {
+    const formatted = action.split("-").map(w => this._capitalize(w)).join(" ");
+    this._showToast(`${formatted} — Coming Soon`);
+  },
+
+  _showToast(message) {
+    const old = document.querySelector('.toast-notification');
+    if (old) old.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (document.body.contains(toast)) toast.remove();
+      }, 300);
+    }, 2500);
   }
 };

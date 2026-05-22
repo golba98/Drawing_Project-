@@ -5322,11 +5322,13 @@ html, body {
 .info-alert {
   background: rgba(200, 149, 42, 0.06);
   border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
   border-radius: 6px;
   padding: 14px 18px;
   font-size: 13px;
   color: var(--cream2);
   line-height: 1.5;
+  margin-top: 20px;
 }
 
 /* ── ANIMATIONS & TOAST ── */
@@ -5627,4 +5629,33 @@ html, body {
 .overview-quick-actions .btn {
   font-size: 12px;
   font-family: var(--font-mono);
+}
+
+/* ── UTILITY CLASSES ────────────────────────────────────────────────────────── */
+
+.btn-nav-disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.strip-sep {
+  color: var(--border2);
+}
+
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1.5px solid var(--gold);
+  color: var(--gold2);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+  animation: fadeUp 0.3s ease both;
 }
