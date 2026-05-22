@@ -56,7 +56,8 @@ function setup() {
   // Hand off to the view layer — sketch.js is loaded last so all classes are ready
   FileManagerView.init();
   EditorView.init();
-  FileManagerView.show();
+  StudyLibraryView.init();
+  StudyLibraryView.show();
 }
 
 function draw() {

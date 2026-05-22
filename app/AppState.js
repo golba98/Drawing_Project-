@@ -22,6 +22,6 @@ const AppState = {
     EditorView.close();
     this.currentNotebookId = null;
     this.currentView = 'fileManager';
-    FileManagerView.show(); // re-renders cards so updated timestamp is visible
+    StudyLibraryView.show(); // re-renders study library on return
   }
 };

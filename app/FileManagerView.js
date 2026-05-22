@@ -23,57 +23,63 @@ const FileManagerView = {
     }
 
     // New Notebook button
-    document.getElementById('new-notebook-btn')
-      .addEventListener('click', () => this.openModal());
+    const newNotebookBtn = document.getElementById('new-notebook-btn');
+    if (newNotebookBtn) {
+      newNotebookBtn.addEventListener('click', () => this.openModal());
+    }
 
     // Modal controls
-    document.getElementById('modal-cancel')
-      .addEventListener('click', () => this.closeModal());
-    document.getElementById('modal-create')
-      .addEventListener('click', () => this._handleCreate());
+    const cancelBtn = document.getElementById('modal-cancel');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeModal());
+    const createBtn = document.getElementById('modal-create');
+    if (createBtn) createBtn.addEventListener('click', () => this._handleCreate());
 
     // Close modal when clicking the dark overlay
-    this._modal.addEventListener('click', e => {
-      if (e.target === this._modal) this.closeModal();
-    });
+    if (this._modal) {
+      this._modal.addEventListener('click', e => {
+        if (e.target === this._modal) this.closeModal();
+      });
+
+      // Modal Subjectpreset chips selection
+      const chips = this._modal.querySelectorAll('.sub-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          this._selectedSubject = chip.dataset.subject;
+        });
+      });
+
+      // Modal Cover color dots selection
+      const colorDots = this._modal.querySelectorAll('.color-dot');
+      colorDots.forEach(dot => {
+        const radio = dot.querySelector('input[type="radio"]');
+        dot.addEventListener('click', () => {
+          colorDots.forEach(d => d.classList.remove('active'));
+          dot.classList.add('active');
+          if (radio) radio.checked = true;
+          this._selectedCoverColor = radio.value;
+        });
+      });
+
+      // Modal Paper appearance selection chips
+      const paperChips = this._modal.querySelectorAll('.paper-theme-chip');
+      paperChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          paperChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          this._selectedPaperTheme = chip.dataset.value;
+        });
+      });
+    }
 
     // Enter key submits create form
-    document.getElementById('notebook-title-input')
-      .addEventListener('keydown', e => {
+    const titleInput = document.getElementById('notebook-title-input');
+    if (titleInput) {
+      titleInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') this._handleCreate();
       });
-
-    // Modal Subjectpreset chips selection
-    const chips = this._modal.querySelectorAll('.sub-chip');
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        this._selectedSubject = chip.dataset.subject;
-      });
-    });
-
-    // Modal Cover color dots selection
-    const colorDots = this._modal.querySelectorAll('.color-dot');
-    colorDots.forEach(dot => {
-      const radio = dot.querySelector('input[type="radio"]');
-      dot.addEventListener('click', () => {
-        colorDots.forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-        if (radio) radio.checked = true;
-        this._selectedCoverColor = radio.value;
-      });
-    });
-
-    // Modal Paper appearance selection chips
-    const paperChips = this._modal.querySelectorAll('.paper-theme-chip');
-    paperChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        paperChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        this._selectedPaperTheme = chip.dataset.value;
-      });
-    });
+    }
 
     // Filter tabs & sidebar navigation items
     document.querySelectorAll('.filter-tab').forEach(tab => {
