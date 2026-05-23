@@ -196,6 +196,58 @@ const LibraryStorage = {
     return topic;
   },
 
+  // ── Sketch Pages ─────────────────────────────────────────────────────────
+
+  addPage({ yearId, semesterId, subjectId, topicId }, title) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    if (!Array.isArray(topic.pages)) topic.pages = [];
+    const existingIds = new Set(topic.pages.map(p => p.id));
+    let n = topic.pages.length + 1;
+    let id = `${topicId}-p${String(n).padStart(3, '0')}`;
+    while (existingIds.has(id)) { n++; id = `${topicId}-p${String(n).padStart(3, '0')}`; }
+    const page = { id, title: title || `Page ${n}`, createdAt: Date.now(), updatedAt: Date.now(), dataUrl: null };
+    topic.pages.push(page);
+    this._save(data);
+    return page;
+  },
+
+  renamePage({ yearId, semesterId, subjectId, topicId }, pageId, newTitle) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    const page = (topic.pages || []).find(p => p.id === pageId);
+    if (!page) return null;
+    page.title     = newTitle;
+    page.updatedAt = Date.now();
+    this._save(data);
+    return page;
+  },
+
+  deletePage({ yearId, semesterId, subjectId, topicId }, pageId) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic || !Array.isArray(topic.pages)) return false;
+    const idx = topic.pages.findIndex(p => p.id === pageId);
+    if (idx === -1) return false;
+    topic.pages.splice(idx, 1);
+    this._save(data);
+    return true;
+  },
+
+  updatePageData({ yearId, semesterId, subjectId, topicId }, pageId, dataUrl) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    const page = (topic.pages || []).find(p => p.id === pageId);
+    if (!page) return null;
+    page.dataUrl   = dataUrl;
+    page.updatedAt = Date.now();
+    this._save(data);
+    return page;
+  },
+
   // ── Private ───────────────────────────────────────────────────────────────
 
   _load() {
@@ -231,5 +283,11 @@ const LibraryStorage = {
     const sem = this._findSem(data, yearId, semesterId);
     if (!sem) return null;
     return sem.subjects.find(s => s.id === subjectId) || null;
-  }
+  },
+
+  _findTopic(data, yearId, semesterId, subjectId, topicId) {
+    const subject = this._findSubject(data, yearId, semesterId, subjectId);
+    if (!subject) return null;
+    return subject.topics.find(t => t.id === topicId) || null;
+  },
 };

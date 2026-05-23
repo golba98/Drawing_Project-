@@ -210,6 +210,27 @@ const LibraryModal = {
           <p class="lib-modal-danger-text">Permanently delete <strong>${e(config.topic?.title)}</strong>? This cannot be undone.</p>
           ${footer('Cancel', 'Delete Topic', true)}`;
 
+      // ── Sketch Pages ──
+      case 'rename-sketch-page':
+        return `
+          <h2>Rename Page</h2>
+          <label for="lib-modal-label">Page name</label>
+          <input type="text" id="lib-modal-label" value="${e(config.page?.title)}" maxlength="60" autocomplete="off">
+          <div class="lib-modal-error hidden" id="lib-modal-err"></div>
+          ${footer('Cancel', 'Save')}`;
+
+      case 'delete-sketch-page':
+        return `
+          <h2>Delete Page</h2>
+          <p class="lib-modal-danger-text">Permanently delete <strong>${e(config.page?.title)}</strong> and its drawing? This cannot be undone.</p>
+          ${footer('Cancel', 'Delete Page', true)}`;
+
+      case 'clear-sketch-page':
+        return `
+          <h2>Clear Page</h2>
+          <p class="lib-modal-danger-text">Clear all drawing on <strong>${e(config.page?.title)}</strong>? This cannot be undone.</p>
+          ${footer('Cancel', 'Clear Page', true)}`;
+
       default:
         return `<h2>Unknown</h2>${footer('Close')}`;
     }
@@ -343,6 +364,11 @@ const LibraryModal = {
         const title = labelInput?.value.trim();
         if (!title) { showErr('Topic name is required.'); return null; }
         return { title, type: this._box.querySelector('#lib-modal-type')?.value || 'lecture' };
+      }
+      case 'rename-sketch-page': {
+        const title = labelInput?.value.trim();
+        if (!title) { showErr('Name is required.'); return null; }
+        return { title };
       }
       // Confirmation-only modals — no form data to collect
       default:

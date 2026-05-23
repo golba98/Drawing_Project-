@@ -299,6 +299,7 @@ const StudyLibraryView = {
   // ── Render entry point ────────────────────────────────────────────────────
 
   render() {
+    if (typeof SketchesView !== 'undefined') SketchesView.unmount();
     if (this._searchInput) {
       this._searchInput.placeholder = LibraryState.viewMode === 'topic'
         ? 'Search applies to modules and topics...'
@@ -726,6 +727,7 @@ const StudyLibraryView = {
   },
 
   _updateTopicTabPanel(subject, topic) {
+    if (typeof SketchesView !== 'undefined') SketchesView.unmount();
     const panel = document.getElementById('topic-tab-panel');
     if (!panel) return;
 
@@ -783,14 +785,18 @@ const StudyLibraryView = {
           </div>`;
         break;
 
-      case 'sketches':
-        html = `
-          <div class="tab-empty-state animate-fade">
-            <span class="empty-icon">🎨</span>
-            <h4>No sketches yet</h4>
-            <button class="btn btn-primary" data-action="add-sketch">+ Add Sketch</button>
-          </div>`;
-        break;
+      case 'sketches': {
+        panel.style.padding  = '0';
+        panel.style.overflow = 'hidden';
+        panel.innerHTML      = '';
+        SketchesView.mount(panel, topic, {
+          yearId:     LibraryState.selectedYearId,
+          semesterId: LibraryState.selectedSemesterId,
+          subjectId:  LibraryState.selectedSubjectId,
+          topicId:    topic.id,
+        });
+        return;
+      }
 
       case 'tasks':
         html = `
@@ -810,6 +816,8 @@ const StudyLibraryView = {
         break;
     }
 
+    panel.style.padding  = '';
+    panel.style.overflow = '';
     panel.innerHTML = html;
   },
 
