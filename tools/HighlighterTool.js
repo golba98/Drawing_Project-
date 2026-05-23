@@ -6,19 +6,25 @@ class HighlighterTool {
     this.name        = 'highlighter';
     this.strokeWidth = 20;
     this.alpha       = 100;
+
+    // Cache resolved highlight color; invalidated when theme changes
+    this._cachedStroke = null;
+    window.addEventListener('themeChanged',     () => { this._cachedStroke = null; });
+    window.addEventListener('pageThemeChanged', () => { this._cachedStroke = null; });
   }
 
   _getHighlightStroke() {
-    const notebook = typeof AppState !== 'undefined' && AppState.currentNotebookId 
-      ? StorageManager.getNotebook(AppState.currentNotebookId) 
+    if (this._cachedStroke) return this._cachedStroke;
+    const notebook = typeof AppState !== 'undefined' && AppState.currentNotebookId
+      ? StorageManager.getNotebook(AppState.currentNotebookId)
       : null;
-    const resolvedTheme = typeof ThemeManager !== 'undefined' 
-      ? ThemeManager.resolvePageTheme(notebook) 
+    const resolvedTheme = typeof ThemeManager !== 'undefined'
+      ? ThemeManager.resolvePageTheme(notebook)
       : 'light';
-    if (resolvedTheme === 'dark') {
-      return [100, 200, 255, 80]; // soft translucent blue highlight on dark paper
-    }
-    return [255, 255, 0, this.alpha]; // translucent yellow highlight on light paper
+    this._cachedStroke = resolvedTheme === 'dark'
+      ? [100, 200, 255, 80]        // soft translucent blue highlight on dark paper
+      : [255, 255, 0, this.alpha]; // translucent yellow highlight on light paper
+    return this._cachedStroke;
   }
 
   mousePressed(p, layer) {
