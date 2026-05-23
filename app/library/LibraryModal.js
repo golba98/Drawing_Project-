@@ -210,6 +210,21 @@ const LibraryModal = {
           <p class="lib-modal-danger-text">Permanently delete <strong>${e(config.topic?.title)}</strong>? This cannot be undone.</p>
           ${footer('Cancel', 'Delete Topic', true)}`;
 
+      // ── Notes ──
+      case 'rename-note':
+        return `
+          <h2>Rename Note</h2>
+          <label for="lib-modal-label">Note title</label>
+          <input type="text" id="lib-modal-label" value="${e(config.note?.title)}" maxlength="80" autocomplete="off">
+          <div class="lib-modal-error hidden" id="lib-modal-err"></div>
+          ${footer('Cancel', 'Save')}`;
+
+      case 'delete-note':
+        return `
+          <h2>Delete Note</h2>
+          <p class="lib-modal-danger-text">Permanently delete <strong>${e(config.note?.title)}</strong>? This cannot be undone.</p>
+          ${footer('Cancel', 'Delete Note', true)}`;
+
       // ── Sketch Pages ──
       case 'rename-sketch-page':
         return `
@@ -365,6 +380,7 @@ const LibraryModal = {
         if (!title) { showErr('Topic name is required.'); return null; }
         return { title, type: this._box.querySelector('#lib-modal-type')?.value || 'lecture' };
       }
+      case 'rename-note':
       case 'rename-sketch-page': {
         const title = labelInput?.value.trim();
         if (!title) { showErr('Name is required.'); return null; }

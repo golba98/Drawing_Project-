@@ -277,10 +277,6 @@ const StudyLibraryView = {
         case 'new-subject':
         case 'more-actions':
         case 'settings':
-        case 'add-note':
-        case 'add-file':
-        case 'add-sketch':
-        case 'add-task':
           this._showComingSoon(action);
           break;
 
@@ -300,6 +296,7 @@ const StudyLibraryView = {
 
   render() {
     if (typeof SketchesView !== 'undefined') SketchesView.unmount();
+    if (typeof NotesView    !== 'undefined') NotesView.unmount();
     if (this._searchInput) {
       this._searchInput.placeholder = LibraryState.viewMode === 'topic'
         ? 'Search applies to modules and topics...'
@@ -667,6 +664,9 @@ const StudyLibraryView = {
     const topic = subject.topics.find(t => t.id === LibraryState.selectedTopicId);
     if (!topic) return;
 
+    const validTabs = ['overview', 'notes', 'pages'];
+    if (!validTabs.includes(LibraryState.activeTopicTab)) LibraryState.activeTopicTab = 'overview';
+
     const type         = topic.type;
     const typeBadgeClass = this._getTypeBadgeClass(type);
     const idx          = subject.topics.findIndex(t => t.id === LibraryState.selectedTopicId);
@@ -713,12 +713,9 @@ const StudyLibraryView = {
 
       <div class="topic-workspace-tabs">
         <div class="workspace-tabs-strip">
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'overview'  ? 'active' : ''}" data-action="set-tab" data-tab="overview">Overview</button>
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'notes'     ? 'active' : ''}" data-action="set-tab" data-tab="notes">Notes</button>
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'files'     ? 'active' : ''}" data-action="set-tab" data-tab="files">Files</button>
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'sketches'  ? 'active' : ''}" data-action="set-tab" data-tab="sketches">Sketches</button>
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'tasks'     ? 'active' : ''}" data-action="set-tab" data-tab="tasks">Tasks</button>
-          <button class="workspace-tab ${LibraryState.activeTopicTab === 'exam-prep' ? 'active' : ''}" data-action="set-tab" data-tab="exam-prep">Exam Prep</button>
+          <button class="workspace-tab ${LibraryState.activeTopicTab === 'overview' ? 'active' : ''}" data-action="set-tab" data-tab="overview">Overview</button>
+          <button class="workspace-tab ${LibraryState.activeTopicTab === 'notes'    ? 'active' : ''}" data-action="set-tab" data-tab="notes">Notes</button>
+          <button class="workspace-tab ${LibraryState.activeTopicTab === 'pages'    ? 'active' : ''}" data-action="set-tab" data-tab="pages">Pages</button>
         </div>
         <div class="workspace-panel" id="topic-tab-panel"></div>
       </div>`;
@@ -728,6 +725,7 @@ const StudyLibraryView = {
 
   _updateTopicTabPanel(subject, topic) {
     if (typeof SketchesView !== 'undefined') SketchesView.unmount();
+    if (typeof NotesView    !== 'undefined') NotesView.unmount();
     const panel = document.getElementById('topic-tab-panel');
     if (!panel) return;
 
@@ -767,25 +765,20 @@ const StudyLibraryView = {
           </div>`;
         break;
 
-      case 'notes':
-        html = `
-          <div class="tab-empty-state animate-fade">
-            <span class="empty-icon">📝</span>
-            <h4>No notes yet</h4>
-            <button class="btn btn-primary" data-action="add-note">+ Add Note</button>
-          </div>`;
-        break;
+      case 'notes': {
+        panel.style.padding  = '0';
+        panel.style.overflow = 'hidden';
+        panel.innerHTML      = '';
+        NotesView.mount(panel, topic, {
+          yearId:     LibraryState.selectedYearId,
+          semesterId: LibraryState.selectedSemesterId,
+          subjectId:  LibraryState.selectedSubjectId,
+          topicId:    topic.id,
+        });
+        return;
+      }
 
-      case 'files':
-        html = `
-          <div class="tab-empty-state animate-fade">
-            <span class="empty-icon">📁</span>
-            <h4>No files yet</h4>
-            <button class="btn btn-primary" data-action="add-file">+ Add File</button>
-          </div>`;
-        break;
-
-      case 'sketches': {
+      case 'pages': {
         panel.style.padding  = '0';
         panel.style.overflow = 'hidden';
         panel.innerHTML      = '';
@@ -797,23 +790,6 @@ const StudyLibraryView = {
         });
         return;
       }
-
-      case 'tasks':
-        html = `
-          <div class="tab-empty-state animate-fade">
-            <span class="empty-icon">✅</span>
-            <h4>No tasks yet</h4>
-            <button class="btn btn-primary" data-action="add-task">+ Add Task</button>
-          </div>`;
-        break;
-
-      case 'exam-prep':
-        html = `
-          <div class="tab-empty-state animate-fade">
-            <span class="empty-icon">📋</span>
-            <h4>Exam prep coming soon</h4>
-          </div>`;
-        break;
     }
 
     panel.style.padding  = '';

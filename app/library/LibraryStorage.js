@@ -168,7 +168,7 @@ const LibraryStorage = {
     let n  = subject.topics.length + 1;
     let id = `${subjectId}-t${String(n).padStart(3, '0')}`;
     while (existingIds.has(id)) { n++; id = `${subjectId}-t${String(n).padStart(3, '0')}`; }
-    const topic = { id, title, type: type || 'lecture', status: 'none' };
+    const topic = { id, title, type: type || 'lecture', status: 'none', notes: [], pages: [] };
     subject.topics.push(topic);
     this._save(data);
     return topic;
@@ -194,6 +194,58 @@ const LibraryStorage = {
     topic.status = status;
     this._save(data);
     return topic;
+  },
+
+  // ── Notes ────────────────────────────────────────────────────────────────
+
+  addNote({ yearId, semesterId, subjectId, topicId }, title) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    if (!Array.isArray(topic.notes)) topic.notes = [];
+    const existingIds = new Set(topic.notes.map(n => n.id));
+    let n = topic.notes.length + 1;
+    let id = `${topicId}-n${String(n).padStart(3, '0')}`;
+    while (existingIds.has(id)) { n++; id = `${topicId}-n${String(n).padStart(3, '0')}`; }
+    const note = { id, title: title || `Note ${n}`, content: '', createdAt: Date.now(), updatedAt: Date.now() };
+    topic.notes.push(note);
+    this._save(data);
+    return note;
+  },
+
+  renameNote({ yearId, semesterId, subjectId, topicId }, noteId, newTitle) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    const note = (topic.notes || []).find(n => n.id === noteId);
+    if (!note) return null;
+    note.title     = newTitle;
+    note.updatedAt = Date.now();
+    this._save(data);
+    return note;
+  },
+
+  deleteNote({ yearId, semesterId, subjectId, topicId }, noteId) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic || !Array.isArray(topic.notes)) return false;
+    const idx = topic.notes.findIndex(n => n.id === noteId);
+    if (idx === -1) return false;
+    topic.notes.splice(idx, 1);
+    this._save(data);
+    return true;
+  },
+
+  updateNoteContent({ yearId, semesterId, subjectId, topicId }, noteId, content) {
+    const data  = this.getData();
+    const topic = this._findTopic(data, yearId, semesterId, subjectId, topicId);
+    if (!topic) return null;
+    const note = (topic.notes || []).find(n => n.id === noteId);
+    if (!note) return null;
+    note.content   = content;
+    note.updatedAt = Date.now();
+    this._save(data);
+    return note;
   },
 
   // ── Sketch Pages ─────────────────────────────────────────────────────────
