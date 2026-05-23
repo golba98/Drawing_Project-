@@ -5825,7 +5825,7 @@ html, body {
 
 .sketches-workspace {
   display: flex;
-  height: 540px;
+  height: 760px;
   background: var(--bg2);
   border-radius: 0 0 10px 10px;
   overflow: hidden;
@@ -6082,21 +6082,125 @@ html, body {
   outline-offset: 1px;
 }
 
-/* ── Canvas ──────────────────────────────────────────────────────────────── */
-
 .sketches-canvas-wrap {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: var(--bg);
+  background: var(--bg3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
 }
 
 .sketches-canvas-wrap canvas {
   display: block;
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(200, 149, 42, 0.2);
+  border-radius: 6px;
+  background: #0C0F18;
   cursor: crosshair;
   touch-action: none;
+  box-sizing: border-box;
+}
+
+/* Color Preset Chips */
+.sketch-color-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+}
+
+.sketch-color-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.sketch-color-chip:hover {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sketch-color-chip.active {
+  transform: scale(1.15);
+  border-color: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+/* Custom Color Picker Wrap */
+.sketch-custom-color-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.sketch-custom-color-btn:hover {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sketch-custom-color-btn.active {
+  transform: scale(1.15);
+  border-color: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.sketch-custom-color-btn input[type="color"] {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Size Chips Styling */
+.sketch-size-presets {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+
+.sketch-size-chip {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.sketch-size-chip:hover {
+  color: var(--cream2);
+  border-color: var(--border2);
+}
+
+.sketch-size-chip.active {
+  background: rgba(200, 149, 42, 0.12);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════

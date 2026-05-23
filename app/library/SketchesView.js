@@ -14,6 +14,8 @@ const SketchesView = {
   _saveTimer:    null,
   _bound:        null,
   _activeTool:   'pencil',
+  _activeColor:  '#F0E6C8',
+  _activeSize:   4,
 
   // ── Public API ────────────────────────────────────────────────────────────
 
@@ -42,6 +44,8 @@ const SketchesView = {
 
     this._activePageId = this._pages[0].id;
     this._activeTool   = 'pencil';
+    this._activeColor  = '#F0E6C8';
+    this._activeSize   = 4;
 
     // Inject HTML and zero-out panel padding (set by parent for other tabs)
     this._render();
@@ -50,6 +54,8 @@ const SketchesView = {
     const wrap = panelEl.querySelector('.sketches-canvas-wrap');
     this._canvas = new DrawingCanvas(wrap);
     this._canvas.mount();
+    this._canvas.setColor(this._activeColor);
+    this._canvas.setSize(this._activeSize);
 
     // Wire canvas events
     this._canvas.on('stroke-end',      () => this._scheduleAutosave());
@@ -97,6 +103,8 @@ const SketchesView = {
     this._coords       = null;
     this._pages        = null;
     this._activePageId = null;
+    this._activeColor  = '#F0E6C8';
+    this._activeSize   = 4;
   },
 
   // ── Rendering ─────────────────────────────────────────────────────────────
@@ -147,23 +155,78 @@ const SketchesView = {
 
   _renderToolbar() {
     const tool = this._activeTool;
+    const color = this._activeColor;
+    const size = this._activeSize;
+
     const tb   = (name, label) =>
       `<button class="sketch-tool-btn${tool === name ? ' active' : ''}"
                data-sketch-action="set-tool" data-tool="${name}">${label}</button>`;
+
+    // Render color preset chips
+    const presets = [
+      { hex: '#0B0C10', name: 'Black' },
+      { hex: '#FFFFFF', name: 'White' },
+      { hex: '#E8B84B', name: 'Gold' },
+      { hex: '#C96253', name: 'Red' },
+      { hex: '#3B5F88', name: 'Blue' },
+      { hex: '#4A7C59', name: 'Green' }
+    ];
+
+    const colorChipsHtml = presets.map(p => {
+      const active = color.toLowerCase() === p.hex.toLowerCase();
+      return `<button class="sketch-color-chip${active ? ' active' : ''}"
+                      style="background-color: ${p.hex};"
+                      data-sketch-action="set-preset-color"
+                      data-hex="${p.hex}"
+                      title="${p.name}"></button>`;
+    }).join('');
+
+    // Custom color button with color picker input inside
+    const isCustomActive = !presets.some(p => p.hex.toLowerCase() === color.toLowerCase());
+    const customColorBtnHtml = `
+      <div class="sketch-custom-color-btn${isCustomActive ? ' active' : ''}" title="Custom Color">
+        <input type="color" id="sketch-color-input" value="${color}">
+      </div>`;
+
+    // Size preset buttons
+    const sizes = [
+      { px: 2,  name: 'Small' },
+      { px: 6,  name: 'Medium' },
+      { px: 12, name: 'Large' }
+    ];
+
+    const sizeChipsHtml = sizes.map(s => {
+      const active = size === s.px;
+      return `<button class="sketch-size-chip${active ? ' active' : ''}"
+                      data-sketch-action="set-preset-size"
+                      data-px="${s.px}">${s.name}</button>`;
+    }).join('');
+
     return `
       <div class="sketches-toolbar">
         ${tb('pencil', 'Pencil')}
         ${tb('pen',    'Pen')}
         ${tb('eraser', 'Eraser')}
-        ${tb('line',   'Line')}
+        ${tb('line',   'Ruler')}
         <span class="sketch-toolbar-sep"></span>
-        <label class="sketch-color-wrap" title="Stroke color">
-          <input type="color" id="sketch-color-input" value="#F0E6C8">
-        </label>
+        
+        <div class="sketch-color-presets">
+          ${colorChipsHtml}
+          ${customColorBtnHtml}
+        </div>
+        
+        <span class="sketch-toolbar-sep"></span>
+        
+        <div class="sketch-size-presets">
+          ${sizeChipsHtml}
+        </div>
+        
         <label class="sketch-size-wrap" title="Stroke size">
-          <input type="range" id="sketch-size-input" min="1" max="40" value="4">
+          <input type="range" id="sketch-size-input" min="1" max="40" value="${size}">
         </label>
+        
         <span class="sketch-toolbar-sep"></span>
+        
         <button id="sketch-undo-btn" class="sketch-action-btn"
                 data-sketch-action="undo" disabled>Undo</button>
         <button id="sketch-redo-btn" class="sketch-action-btn"
@@ -186,11 +249,15 @@ const SketchesView = {
     if (e.type === 'input' || e.type === 'change') {
       const tgt = e.target;
       if (tgt.id === 'sketch-color-input' && this._canvas) {
+        this._activeColor = tgt.value;
         this._canvas.setColor(tgt.value);
+        this._updatePresetsActiveStates();
         e.stopPropagation();
       }
       if (tgt.id === 'sketch-size-input' && this._canvas) {
+        this._activeSize = Number(tgt.value);
         this._canvas.setSize(Number(tgt.value));
+        this._updatePresetsActiveStates();
         e.stopPropagation();
       }
       return;
@@ -230,6 +297,22 @@ const SketchesView = {
       case 'clear-page':
         this._clearPage();
         break;
+      case 'set-preset-color':
+        if (el.dataset.hex && this._canvas) {
+          const hex = el.dataset.hex;
+          this._activeColor = hex;
+          this._canvas.setColor(hex);
+          this._updatePresetsActiveStates();
+        }
+        break;
+      case 'set-preset-size':
+        if (el.dataset.px && this._canvas) {
+          const px = Number(el.dataset.px);
+          this._activeSize = px;
+          this._canvas.setSize(px);
+          this._updatePresetsActiveStates();
+        }
+        break;
     }
   },
 
@@ -260,6 +343,8 @@ const SketchesView = {
     if (!page) return;
 
     this._canvas.loadFromDataUrl(page.dataUrl || null);
+    this._canvas.setColor(this._activeColor);
+    this._canvas.setSize(this._activeSize);
     this._refreshPageList();
     this._updateHistoryButtons();
   },
@@ -366,5 +451,43 @@ const SketchesView = {
     const redoBtn = this._panel.querySelector('#sketch-redo-btn');
     if (undoBtn) undoBtn.disabled = !this._canvas || !this._canvas.canUndo();
     if (redoBtn) redoBtn.disabled = !this._canvas || !this._canvas.canRedo();
+  },
+
+  _updatePresetsActiveStates() {
+    if (!this._panel) return;
+
+    // Update color chips active state
+    const presets = ['#0B0C10', '#FFFFFF', '#E8B84B', '#C96253', '#3B5F88', '#4A7C59'];
+    const color = this._activeColor.toLowerCase();
+
+    this._panel.querySelectorAll('.sketch-color-chip').forEach(chip => {
+      const hex = chip.dataset.hex.toLowerCase();
+      chip.classList.toggle('active', hex === color);
+    });
+
+    // Update custom color btn active state
+    const customColorBtn = this._panel.querySelector('.sketch-custom-color-btn');
+    if (customColorBtn) {
+      const isCustomActive = !presets.some(p => p.toLowerCase() === color);
+      customColorBtn.classList.toggle('active', isCustomActive);
+
+      const customInput = customColorBtn.querySelector('#sketch-color-input');
+      if (customInput && customInput.value.toLowerCase() !== color) {
+        customInput.value = this._activeColor;
+      }
+    }
+
+    // Update size chips active state
+    const size = this._activeSize;
+    this._panel.querySelectorAll('.sketch-size-chip').forEach(chip => {
+      const px = Number(chip.dataset.px);
+      chip.classList.toggle('active', px === size);
+    });
+
+    // Update slider value
+    const slider = this._panel.querySelector('#sketch-size-input');
+    if (slider && Number(slider.value) !== size) {
+      slider.value = size;
+    }
   },
 };

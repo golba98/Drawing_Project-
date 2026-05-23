@@ -9,7 +9,6 @@ function DrawingCanvas(containerEl) {
   let _canvas    = null;
   let _ctx       = null;
   let _container = containerEl;
-  let _observer  = null;
 
   let _tool    = 'pencil';
   let _color   = '#F0E6C8';
@@ -42,17 +41,26 @@ function DrawingCanvas(containerEl) {
     _ctx           = _canvas.getContext('2d');
     _container.appendChild(_canvas);
 
+    _canvas.width  = 900;
+    _canvas.height = 1200;
+    _lastW         = 900;
+    _lastH         = 1200;
+
     _canvas.addEventListener('pointerdown', _onPointerDown);
     _canvas.addEventListener('pointermove', _onPointerMove);
     _canvas.addEventListener('pointerup',   _onPointerUp);
     _canvas.addEventListener('pointerleave', _onPointerLeave);
 
-    _observer = new ResizeObserver(_onResize);
-    _observer.observe(_container);
+    _fill();
+
+    if (_pendingLoad) {
+      const url = _pendingLoad;
+      _pendingLoad = null;
+      this.loadFromDataUrl(url);
+    }
   };
 
   this.unmount = function () {
-    if (_observer) { _observer.disconnect(); _observer = null; }
     if (_canvas) {
       _canvas.removeEventListener('pointerdown', _onPointerDown);
       _canvas.removeEventListener('pointermove', _onPointerMove);
@@ -180,7 +188,7 @@ function DrawingCanvas(containerEl) {
 
     if (_tool === 'eraser') {
       _ctx.save();
-      _ctx.globalCompositeOperation = 'destination-out';
+      _ctx.fillStyle = PAPER_BG;
       _ctx.beginPath();
       _ctx.arc(x, y, _size / 2, 0, Math.PI * 2);
       _ctx.fill();
@@ -217,12 +225,15 @@ function DrawingCanvas(containerEl) {
 
     if (_tool === 'eraser') {
       _ctx.save();
-      _ctx.globalCompositeOperation = 'destination-out';
-      _interpolatePath(_lastX, _lastY, x, y, _size / 2, function (px, py) {
-        _ctx.beginPath();
-        _ctx.arc(px, py, _size / 2, 0, Math.PI * 2);
-        _ctx.fill();
-      });
+      _ctx.strokeStyle = PAPER_BG;
+      _ctx.fillStyle   = PAPER_BG;
+      _ctx.lineWidth   = _size;
+      _ctx.lineCap     = 'round';
+      _ctx.lineJoin    = 'round';
+      _ctx.beginPath();
+      _ctx.moveTo(_lastX, _lastY);
+      _ctx.lineTo(x, y);
+      _ctx.stroke();
       _ctx.restore();
     } else if (_tool === 'pencil') {
       _ctx.save();
@@ -301,39 +312,6 @@ function DrawingCanvas(containerEl) {
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
       fn(x0 + dx * t, y0 + dy * t);
-    }
-  }
-
-  // ── Resize ──────────────────────────────────────────────────────────────────
-
-  function _onResize(entries) {
-    const entry = entries[0];
-    if (!entry) return;
-    const newW = Math.floor(entry.contentRect.width);
-    const newH = Math.floor(entry.contentRect.height);
-    if (newW === _lastW && newH === _lastH) return;
-    if (newW === 0 || newH === 0) return;
-
-    let saved = null;
-    if (_ctx && _lastW > 0 && _lastH > 0) {
-      saved = _ctx.getImageData(0, 0, _canvas.width, _canvas.height);
-    }
-
-    _canvas.width  = newW;
-    _canvas.height = newH;
-    _lastW = newW;
-    _lastH = newH;
-
-    _fill();
-
-    if (saved) {
-      _ctx.putImageData(saved, 0, 0);
-    } else if (_pendingLoad) {
-      const url = _pendingLoad;
-      _pendingLoad = null;
-      const img = new Image();
-      img.onload = function () { if (_ctx) _ctx.drawImage(img, 0, 0); };
-      img.src = url;
     }
   }
 }
