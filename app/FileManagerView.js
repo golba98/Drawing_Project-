@@ -338,7 +338,7 @@ const FileManagerView = {
           <span class="book book-six">Lab</span>
           <span class="book book-seven">Essay</span>
         </div>
-        <h2>No class notebooks yet</h2>
+        <h2>No notebooks yet</h2>
         <p>Create your first notebook for a subject, lecture, or sketch page.</p>
         <button class="ghost-create-btn empty-create-btn">Create first notebook</button>
       </div>

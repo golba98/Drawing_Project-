@@ -179,5 +179,35 @@ const LibrarySeedData = {
     });
 
     return { lectures, assessments, exams, projects };
+  },
+
+  // Convert static seed data into the nested storage format for bootstrap
+  toStorageFormat() {
+    const accentList = ['#C8952A', '#A0522D', '#8B6F47', '#6B7A3A'];
+    return {
+      years: [{
+        id: 'year-1',
+        label: 'Year 1',
+        calendarYear: '2026',
+        archived: false,
+        accentColor: '#C8952A',
+        semesters: this.semesters.map(sem => ({
+          id: `semester-${sem.id}`,
+          label: `Semester ${sem.id}`,
+          archived: false,
+          subjects: sem.modules.map((mod, mi) => ({
+            id: mod.id,
+            title: mod.name,
+            accentColor: accentList[mi % 4],
+            topics: mod.topics.map((title, ti) => ({
+              id: `${mod.id}-t${String(ti + 1).padStart(3, '0')}`,
+              title,
+              type: this.classifyTopic(title),
+              status: 'none'
+            }))
+          }))
+        }))
+      }]
+    };
   }
 };
