@@ -5659,3 +5659,162 @@ html, body {
   transition: opacity 0.3s ease;
   animation: fadeUp 0.3s ease both;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   feat/year-workspace-navigation — Year/Semester CRUD & navigation styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Years grid ──────────────────────────────────────────────────────────── */
+.years-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+.year-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.18s ease;
+}
+.year-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--gold));
+}
+.year-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); border-color: var(--border2); }
+
+.year-card-label { font-family: var(--font-heading); font-size: 18px; color: var(--cream); font-weight: 700; margin-bottom: 4px; }
+.year-card-cal   { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 12px; }
+.year-card-stats { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+.year-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ── Semester cards (year view) ──────────────────────────────────────────── */
+.semesters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+
+.semester-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.18s ease;
+}
+.semester-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+}
+.semester-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); border-color: var(--border2); }
+
+/* ── Archived badge ──────────────────────────────────────────────────────── */
+.badge-archived {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  position: absolute;
+  top: 12px; right: 12px;
+}
+
+/* ── Card context menu button ────────────────────────────────────────────── */
+.card-menu-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.card-menu-btn:hover { color: var(--cream); border-color: var(--border2); background: var(--bg2); }
+
+/* ── CRUD modal extras ───────────────────────────────────────────────────── */
+.btn-danger { background: #7a1e1e !important; border-color: #a33 !important; color: #ffd !important; }
+.btn-danger:hover { background: #9a2424 !important; }
+
+.lib-modal-danger-text { font-family: var(--font-mono); font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+.lib-modal-error { font-family: var(--font-mono); font-size: 11px; color: #e06060; margin-top: 6px; }
+.lib-modal-error.hidden { display: none; }
+
+.accent-swatches { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.accent-swatch {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.accent-swatch:hover { transform: scale(1.15); }
+.accent-swatch.selected { border-color: var(--cream); box-shadow: 0 0 0 2px var(--bg3); }
+
+/* ── Topic type radio buttons (add-topic modal) ──────────────────────────── */
+.topic-type-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.topic-type-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.topic-type-btn:hover { border-color: var(--border2); color: var(--cream2); }
+.topic-type-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(200,149,42,0.1); }
+
+/* ── Topic status labels ─────────────────────────────────────────────────── */
+.status-wip  { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: #C8952A; }
+.status-done { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: #5A8A5A; }
+
+/* ── Add item button (dashed outline, in view headers) ───────────────────── */
+.add-item-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 16px;
+  border-radius: 7px;
+  border: 1px dashed var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.add-item-btn:hover { color: var(--gold); border-color: var(--gold); background: rgba(200,149,42,0.06); }
+
+/* ── Sidebar context label ───────────────────────────────────────────────── */
+.sidebar-context-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 12px;
+}
+
+/* ── Empty state for empty semester/year views ───────────────────────────── */
+.semester-empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
