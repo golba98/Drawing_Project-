@@ -6,25 +6,36 @@ const SketchesView = {
 
   // ── State (reset on each mount) ───────────────────────────────────────────
 
-  _panel:        null,
-  _coords:       null,
-  _pages:        null,
-  _activePageId: null,
-  _canvas:       null,
-  _saveTimer:    null,
-  _bound:        null,
-  _activeTool:   'pencil',
-  _activeColor:  '#F0E6C8',
-  _activeSize:   4,
+  _panel:          null,
+  _coords:         null,
+  _pages:          null,
+  _activePageId:   null,
+  _canvas:         null,
+  _saveTimer:      null,
+  _resizeTimer:    null,
+  _resizeListener: null,
+  _bound:          null,
+  _activeTool:     'pencil',
+  _activeColor:    '#F0E6C8',
+  _activeSize:     4,
+  _skipBodyClass:  false,
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  mount(panelEl, topic, coords) {
+  renameActive() {
+    if (this._activePageId) this._renamePage(this._activePageId);
+  },
+
+  mount(panelEl, topic, coords, opts = {}) {
     // Ensure clean state
     this.unmount();
 
-    this._panel  = panelEl;
-    this._coords = coords;
+    this._panel         = panelEl;
+    this._coords        = coords;
+    this._skipBodyClass = !!(opts && opts.skipBodyClass);
+
+    // Apply layout-shifting class for the true full-page workspace
+    if (!this._skipBodyClass) document.body.classList.add('pages-workspace-active');
 
     // Ensure topic has pages; auto-create Page 1 if none
     if (!topic.pages || topic.pages.length === 0) {
@@ -61,20 +72,47 @@ const SketchesView = {
     this._canvas.on('stroke-end',      () => this._scheduleAutosave());
     this._canvas.on('history-change',  () => this._updateHistoryButtons());
 
-    // Load first page content
+    // Load first page content after layout has settled so canvas buffer gets correct dimensions
     const firstPage = this._pages[0];
-    this._canvas.loadFromDataUrl(firstPage.dataUrl || null);
-    this._updateHistoryButtons();
+    requestAnimationFrame(() => {
+      if (!this._canvas) return;
+      this._canvas.resize();
+      this._canvas.loadFromDataUrl(firstPage.dataUrl || null);
+      this._updateHistoryButtons();
+    });
 
     // Wire toolbar & sidebar events (use separate listener to avoid bubbling to StudyLibraryView)
     this._bound = (e) => this._handleEvent(e);
     panelEl.addEventListener('click',  this._bound);
     panelEl.addEventListener('input',  this._bound);
     panelEl.addEventListener('change', this._bound);
+
+    // Wire window resize listener; debounced so rapid resize events don't
+    // repeatedly resample the full undo/redo history on every pixel of drag.
+    this._resizeTimer    = null;
+    this._resizeListener = () => {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = setTimeout(() => {
+        if (this._canvas) this._canvas.resize();
+      }, 250);
+    };
+    window.addEventListener('resize', this._resizeListener);
   },
 
   unmount() {
     if (!this._panel) return;
+
+    // Clean up window resize listener and any pending debounce timer
+    if (this._resizeListener) {
+      window.removeEventListener('resize', this._resizeListener);
+      this._resizeListener = null;
+    }
+    clearTimeout(this._resizeTimer);
+    this._resizeTimer = null;
+
+    // Restore body layout state
+    if (!this._skipBodyClass) document.body.classList.remove('pages-workspace-active');
+    this._skipBodyClass = false;
 
     // Flush any unsaved drawing immediately
     this._flushSave();

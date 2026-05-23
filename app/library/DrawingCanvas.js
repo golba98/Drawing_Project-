@@ -34,6 +34,12 @@ function DrawingCanvas(containerEl) {
   // Event listeners
   const _handlers = { 'stroke-end': [], 'history-change': [] };
 
+  // rAF batching for pointermove — only flush once per animation frame
+  let _rafId      = null;
+  let _pendingX   = 0;
+  let _pendingY   = 0;
+  let _hasPending = false;
+
   // ── Public API ──────────────────────────────────────────────────────────────
 
   this.mount = function () {
@@ -41,10 +47,20 @@ function DrawingCanvas(containerEl) {
     _ctx           = _canvas.getContext('2d');
     _container.appendChild(_canvas);
 
-    _canvas.width  = 900;
-    _canvas.height = 1200;
-    _lastW         = 900;
-    _lastH         = 1200;
+    // Dynamic measurement of the container size for high-DPI display
+    const rect = _container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width || 900;
+    const h = rect.height || 1200;
+
+    _canvas.width  = Math.floor(w * dpr);
+    _canvas.height = Math.floor(h * dpr);
+    _lastW         = _canvas.width;
+    _lastH         = _canvas.height;
+
+    // Force style width and height to 100% to fill sketches-canvas-wrap completely
+    _canvas.style.width  = '100%';
+    _canvas.style.height = '100%';
 
     _canvas.addEventListener('pointerdown', _onPointerDown);
     _canvas.addEventListener('pointermove', _onPointerMove);
@@ -61,6 +77,10 @@ function DrawingCanvas(containerEl) {
   };
 
   this.unmount = function () {
+    // Cancel any in-flight animation frame
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+    _hasPending = false;
+
     if (_canvas) {
       _canvas.removeEventListener('pointerdown', _onPointerDown);
       _canvas.removeEventListener('pointermove', _onPointerMove);
@@ -108,6 +128,51 @@ function DrawingCanvas(containerEl) {
     _emit('stroke-end');
   };
 
+  // Resize canvas high-DPI buffer dynamically, scaling drawings & history states without distortion
+  this.resize = function () {
+    if (!_canvas || !_ctx || !_container) return;
+
+    const rect = _container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const newW = Math.floor((rect.width || 900) * dpr);
+    const newH = Math.floor((rect.height || 1200) * dpr);
+
+    if (newW === _canvas.width && newH === _canvas.height) return;
+
+    const oldW = _canvas.width;
+    const oldH = _canvas.height;
+
+    // Capture current pixels in a temp canvas to redraw them scaled
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = oldW;
+    tempCanvas.height = oldH;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(_canvas, 0, 0);
+
+    // Convert and resize all undo/redo history states so they match the new size exactly
+    _undoStack = _undoStack.map(imgData => _resizeImageData(imgData, newW, newH));
+    _redoStack = _redoStack.map(imgData => _resizeImageData(imgData, newW, newH));
+
+    // Update canvas buffer size
+    _canvas.width  = newW;
+    _canvas.height = newH;
+    _lastW         = newW;
+    _lastH         = newH;
+
+    _fill();
+
+    // Redraw old content back centered and scaled to fit while preserving original aspect ratio
+    const scale = Math.min(newW / oldW, newH / oldH);
+    const drawW = oldW * scale;
+    const drawH = oldH * scale;
+    const drawX = (newW - drawW) / 2;
+    const drawY = (newH - drawH) / 2;
+
+    _ctx.drawImage(tempCanvas, drawX, drawY, drawW, drawH);
+
+    _emit('history-change');
+  };
+
   this.loadFromDataUrl = function (dataUrl) {
     _undoStack = [];
     _redoStack = [];
@@ -119,7 +184,16 @@ function DrawingCanvas(containerEl) {
     if (!dataUrl) return;
     const img = new Image();
     img.onload = function () {
-      if (_ctx) _ctx.drawImage(img, 0, 0);
+      if (_ctx) {
+        _fill();
+        // Draw the stored image centered and scaled to fit, preserving original aspect ratio
+        const scale = Math.min(_canvas.width / img.naturalWidth, _canvas.height / img.naturalHeight);
+        const drawW = img.naturalWidth * scale;
+        const drawH = img.naturalHeight * scale;
+        const drawX = (_canvas.width - drawW) / 2;
+        const drawY = (_canvas.height - drawH) / 2;
+        _ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      }
     };
     img.src = dataUrl;
   };
@@ -203,10 +277,27 @@ function DrawingCanvas(containerEl) {
     }
   }
 
+  // Queue the latest pointer position; flush once per animation frame to avoid
+  // processing 60-100 synchronous events per second during fast drawing.
   function _onPointerMove(e) {
     if (!_drawing) return;
     const { x, y } = _pos(e);
+    _pendingX   = x;
+    _pendingY   = y;
+    _hasPending = true;
+    if (!_rafId) _rafId = requestAnimationFrame(_flushMove);
+  }
 
+  function _flushMove() {
+    _rafId = null;
+    if (!_hasPending || !_drawing) { _hasPending = false; return; }
+    const x = _pendingX;
+    const y = _pendingY;
+    _hasPending = false;
+    _execMove(x, y);
+  }
+
+  function _execMove(x, y) {
     if (_tool === 'line') {
       _ctx.putImageData(_linePreviewSnapshot, 0, 0);
       _ctx.save();
@@ -263,6 +354,13 @@ function DrawingCanvas(containerEl) {
   }
 
   function _onPointerUp(e) {
+    // Flush any pending move before committing stroke end
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_hasPending && _drawing && _tool !== 'line') {
+      _execMove(_pendingX, _pendingY);
+    }
+    _hasPending = false;
+
     if (!_drawing) return;
     _drawing = false;
     const { x, y } = _pos(e);
@@ -286,6 +384,12 @@ function DrawingCanvas(containerEl) {
   }
 
   function _onPointerLeave() {
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_hasPending && _drawing && _tool !== 'line') {
+      _execMove(_pendingX, _pendingY);
+    }
+    _hasPending = false;
+
     if (_drawing && _tool !== 'line') {
       _drawing = false;
       _emit('stroke-end');
@@ -313,5 +417,36 @@ function DrawingCanvas(containerEl) {
       const t = i / steps;
       fn(x0 + dx * t, y0 + dy * t);
     }
+  }
+
+  // Resizes a history ImageData state to new dimensions with aspect ratio preserved
+  function _resizeImageData(oldData, newW, newH) {
+    if (!oldData) return oldData;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = oldData.width;
+    tempCanvas.height = oldData.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.putImageData(oldData, 0, 0);
+
+    const destCanvas = document.createElement('canvas');
+    destCanvas.width = newW;
+    destCanvas.height = newH;
+    const destCtx = destCanvas.getContext('2d');
+
+    // Fill with background color first
+    destCtx.fillStyle = PAPER_BG;
+    destCtx.fillRect(0, 0, newW, newH);
+
+    // Scale to fit while preserving aspect ratio to prevent squishing/stretching of drawings
+    const scale = Math.min(newW / oldData.width, newH / oldData.height);
+    const drawW = oldData.width * scale;
+    const drawH = oldData.height * scale;
+    const drawX = (newW - drawW) / 2;
+    const drawY = (newH - drawH) / 2;
+
+    destCtx.drawImage(tempCanvas, drawX, drawY, drawW, drawH);
+
+    return destCtx.getImageData(0, 0, newW, newH);
   }
 }

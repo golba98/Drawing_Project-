@@ -45,12 +45,12 @@ function setup() {
 
   noLoop(); // keep the draw loop stopped until a notebook is opened
 
-  // Redraw canvas on theme updates
+  // Redraw canvas on theme updates; invalidate background buffer so it regenerates
   window.addEventListener('themeChanged', () => {
-    if (isEditorActive) redraw();
+    if (isEditorActive) { pageBackground.invalidate(); redraw(); }
   });
   window.addEventListener('pageThemeChanged', () => {
-    if (isEditorActive) redraw();
+    if (isEditorActive) { pageBackground.invalidate(); redraw(); }
   });
 
   // Hand off to the view layer — sketch.js is loaded last so all classes are ready
@@ -139,19 +139,28 @@ function mouseMoved() {
 
 // ─── Window Resize ────────────────────────────────────────────────────────────
 
-function windowResized() {
-  if (!isEditorActive) return;
-  const container = document.getElementById('canvas-container');
-  const w = container.offsetWidth;
-  const h = container.offsetHeight;
-  resizeCanvas(w, h);
+let _resizeTimer = null;
 
-  // Preserve drawing content at the new size
-  const temp = createGraphics(w, h);
-  temp.clear();
-  temp.image(drawingLayer, 0, 0);
-  drawingLayer.remove();
-  drawingLayer = temp;
+function windowResized() {
+  // Debounce: skip intermediate resize events during window drag
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (!isEditorActive) return;
+    const container = document.getElementById('canvas-container');
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    resizeCanvas(w, h);
+
+    // Preserve drawing content at the new size
+    const temp = createGraphics(w, h);
+    temp.clear();
+    temp.image(drawingLayer, 0, 0);
+    drawingLayer.remove();
+    drawingLayer = temp;
+
+    pageBackground.onResize();
+    redraw();
+  }, 150);
 }
 
 // ─── Utility ─────────────────────────────────────────────────────────────────

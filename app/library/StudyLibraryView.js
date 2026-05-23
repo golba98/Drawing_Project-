@@ -8,6 +8,12 @@ const StudyLibraryView = {
   _searchInput:    null,
   _initialized:    false,
 
+  // Track last rendered doc editor state so render() avoids unmounting when
+  // staying inside the same editor (e.g. a toolbar action while in Pages mode).
+  _lastDocMode:  null,
+  _lastTopicId:  null,
+  _searchTimer:  null,
+
   init() {
     if (this._initialized) return;
     this._initialized = true;
@@ -80,6 +86,7 @@ const StudyLibraryView = {
   openTopic(topicId) {
     LibraryState.selectedTopicId = topicId;
     LibraryState.activeTopicTab  = 'overview';
+    LibraryState.docEditorMode   = null;
     LibraryState.viewMode        = 'topic';
     this.render();
   },
@@ -133,8 +140,15 @@ const StudyLibraryView = {
 
   setTab(tab) {
     LibraryState.activeTopicTab = tab;
-    this._updateTopicTabPanel();
-    this._syncTabButtons();
+    if (tab === 'notes' || tab === 'pages') {
+      LibraryState.docEditorMode = tab;
+      this.render();
+    } else {
+      LibraryState.docEditorMode = null;
+      document.body.classList.remove('doc-editor-active');
+      this._updateTopicTabPanel();
+      this._syncTabButtons();
+    }
   },
 
   // ── Event wiring ──────────────────────────────────────────────────────────
@@ -160,6 +174,20 @@ const StudyLibraryView = {
         case 'previous-topic':   this.navigateTopic(-1); break;
         case 'next-topic':       this.navigateTopic(1); break;
         case 'set-tab':          this.setTab(actionEl.dataset.tab); break;
+
+        case 'exit-doc-editor':
+          if (typeof SketchesView !== 'undefined') SketchesView.unmount();
+          if (typeof NotesView    !== 'undefined') NotesView.unmount();
+          LibraryState.docEditorMode  = null;
+          LibraryState.activeTopicTab = 'overview';
+          document.body.classList.remove('doc-editor-active');
+          this.render();
+          break;
+
+        case 'rename-doc-active':
+          if (LibraryState.docEditorMode === 'notes')      NotesView.renameActive();
+          else if (LibraryState.docEditorMode === 'pages') SketchesView.renameActive();
+          break;
 
         case 'set-topic-status': {
           const { yearId, semesterId, subjectId, topicId, status } = actionEl.dataset;
@@ -288,15 +316,36 @@ const StudyLibraryView = {
     this._container.addEventListener('input', e => {
       if (!e.target.closest('#study-search')) return;
       LibraryState.searchQuery = e.target.value.toLowerCase().trim();
-      this.render();
+      clearTimeout(this._searchTimer);
+      this._searchTimer = setTimeout(() => this.render(), 200);
     });
   },
 
   // ── Render entry point ────────────────────────────────────────────────────
 
   render() {
-    if (typeof SketchesView !== 'undefined') SketchesView.unmount();
-    if (typeof NotesView    !== 'undefined') NotesView.unmount();
+    const newMode    = LibraryState.docEditorMode;
+    const newTopicId = LibraryState.selectedTopicId;
+
+    // Only unmount doc editors when genuinely leaving them (different topic or mode).
+    // Skipping unmount here preserves canvas undo history when the same editor re-renders
+    // (e.g. toolbar interaction, history button click).
+    const stayingInSameEditor = newMode && newMode === this._lastDocMode
+      && newTopicId === this._lastTopicId;
+
+    if (!stayingInSameEditor) {
+      if (typeof SketchesView !== 'undefined') SketchesView.unmount();
+      if (typeof NotesView    !== 'undefined') NotesView.unmount();
+    }
+
+    this._lastDocMode  = newMode;
+    this._lastTopicId  = newTopicId;
+
+    if (LibraryState.viewMode !== 'topic') {
+      document.body.classList.remove('doc-editor-active');
+      LibraryState.docEditorMode = null;
+    }
+
     if (this._searchInput) {
       this._searchInput.placeholder = LibraryState.viewMode === 'topic'
         ? 'Search applies to modules and topics...'
@@ -310,7 +359,14 @@ const StudyLibraryView = {
       case 'year':     this._renderYearView();     break;
       case 'semester': this._renderSemesterView(); break;
       case 'subject':  this._renderSubjectView();  break;
-      case 'topic':    this._renderTopicView();    break;
+      case 'topic':
+        if (LibraryState.docEditorMode) {
+          this._renderDocEditorMode();
+        } else {
+          document.body.classList.remove('doc-editor-active');
+          this._renderTopicView();
+        }
+        break;
     }
   },
 
@@ -721,6 +777,59 @@ const StudyLibraryView = {
       </div>`;
 
     this._updateTopicTabPanel(subject, topic);
+  },
+
+  _renderDocEditorMode() {
+    document.body.classList.add('doc-editor-active');
+    document.body.classList.remove('pages-workspace-active');
+
+    const subject = this._getActiveSubject();
+    const topic   = subject?.topics.find(t => t.id === LibraryState.selectedTopicId);
+    if (!topic) {
+      LibraryState.docEditorMode = null;
+      document.body.classList.remove('doc-editor-active');
+      this._renderTopicView();
+      return;
+    }
+
+    const mode = LibraryState.docEditorMode;
+
+    // If the correct editor is already mounted and we haven't changed topic or mode,
+    // skip the full HTML rebuild and re-mount — preserves canvas undo/redo history.
+    const alreadyMounted =
+      (mode === 'pages' && typeof SketchesView !== 'undefined' && SketchesView._panel) ||
+      (mode === 'notes' && typeof NotesView    !== 'undefined' && NotesView._panel);
+    if (alreadyMounted) return;
+
+    const tabLabel = mode === 'notes' ? 'Notes' : 'Pages';
+    const coords   = {
+      yearId:     LibraryState.selectedYearId,
+      semesterId: LibraryState.selectedSemesterId,
+      subjectId:  LibraryState.selectedSubjectId,
+      topicId:    topic.id,
+    };
+
+    this._contentWrapper.innerHTML = `
+      <div class="doc-editor-layout">
+        <div class="doc-editor-topbar">
+          <button class="btn btn-ghost doc-back-btn" data-action="exit-doc-editor">← Back</button>
+          <div class="doc-editor-title-area">
+            <span class="doc-editor-topic-title">${this._escapeHtml(topic.title)}</span>
+            <span class="doc-editor-tab-chip">${tabLabel}</span>
+          </div>
+          <div class="doc-editor-topbar-right">
+            <button class="btn btn-ghost" data-action="rename-doc-active">Rename</button>
+          </div>
+        </div>
+        <div class="doc-editor-body" id="doc-editor-body"></div>
+      </div>`;
+
+    const body = document.getElementById('doc-editor-body');
+    if (mode === 'notes') {
+      NotesView.mount(body, topic, coords);
+    } else {
+      SketchesView.mount(body, topic, coords, { skipBodyClass: true });
+    }
   },
 
   _updateTopicTabPanel(subject, topic) {
