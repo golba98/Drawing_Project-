@@ -52,6 +52,7 @@ const StudyLibraryView = {
   // ── Navigation ────────────────────────────────────────────────────────────
 
   openYear(yearId) {
+    this._clearTransientUiState();
     LibraryState.selectedYearId      = yearId;
     LibraryState.selectedSemesterId  = null;
     LibraryState.selectedSubjectId   = null;
@@ -62,6 +63,7 @@ const StudyLibraryView = {
   },
 
   selectSemester(semId) {
+    this._clearTransientUiState();
     LibraryState.selectedSemesterId = semId;
     LibraryState.selectedSubjectId  = null;
     LibraryState.selectedTopicId    = null;
@@ -76,6 +78,7 @@ const StudyLibraryView = {
   },
 
   openSubject(subjectId) {
+    this._clearTransientUiState();
     LibraryState.selectedSubjectId = subjectId;
     LibraryState.selectedTopicId   = null;
     LibraryState.viewMode          = 'subject';
@@ -84,6 +87,7 @@ const StudyLibraryView = {
   },
 
   openTopic(topicId) {
+    this._clearTransientUiState();
     LibraryState.selectedTopicId = topicId;
     LibraryState.activeTopicTab  = 'overview';
     LibraryState.docEditorMode   = null;
@@ -92,6 +96,7 @@ const StudyLibraryView = {
   },
 
   goBackToYears() {
+    this._clearTransientUiState();
     LibraryState.selectedYearId     = null;
     LibraryState.selectedSemesterId = null;
     LibraryState.selectedSubjectId  = null;
@@ -102,6 +107,7 @@ const StudyLibraryView = {
   },
 
   goBackToYear() {
+    this._clearTransientUiState();
     LibraryState.selectedSemesterId = null;
     LibraryState.selectedSubjectId  = null;
     LibraryState.selectedTopicId    = null;
@@ -111,6 +117,7 @@ const StudyLibraryView = {
   },
 
   goBackToSemester() {
+    this._clearTransientUiState();
     LibraryState.selectedSubjectId = null;
     LibraryState.selectedTopicId   = null;
     LibraryState.viewMode          = 'semester';
@@ -119,6 +126,7 @@ const StudyLibraryView = {
   },
 
   goBackToSubject() {
+    this._clearTransientUiState();
     LibraryState.selectedTopicId = null;
     LibraryState.viewMode        = 'subject';
     this._clearSearch();
@@ -132,6 +140,7 @@ const StudyLibraryView = {
     if (currentIndex === -1) return;
     const targetIndex = currentIndex + direction;
     if (targetIndex >= 0 && targetIndex < subject.topics.length) {
+      this._clearTransientUiState();
       LibraryState.selectedTopicId = subject.topics[targetIndex].id;
       LibraryState.activeTopicTab  = 'overview';
       this.render();
@@ -139,8 +148,10 @@ const StudyLibraryView = {
   },
 
   setTab(tab) {
+    const enteringDocEditor = tab === 'notes' || tab === 'pages';
+    this._clearTransientUiState({ keepDocEditor: enteringDocEditor });
     LibraryState.activeTopicTab = tab;
-    if (tab === 'notes' || tab === 'pages') {
+    if (enteringDocEditor) {
       LibraryState.docEditorMode = tab;
       this.render();
     } else {
@@ -319,6 +330,8 @@ const StudyLibraryView = {
         default:
           console.warn(`Unhandled action: ${action}`);
       }
+
+      this._releasePressedState(actionEl);
     });
 
     this._container.addEventListener('input', e => {
@@ -926,6 +939,34 @@ const StudyLibraryView = {
     this._container.querySelectorAll('.workspace-tab').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === LibraryState.activeTopicTab);
     });
+  },
+
+  _clearTransientUiState(options = {}) {
+    const keepDocEditor = !!options.keepDocEditor;
+    const keepPagesWorkspace = !!options.keepPagesWorkspace;
+
+    if (!keepDocEditor) document.body.classList.remove('doc-editor-active');
+    if (!keepPagesWorkspace) document.body.classList.remove('pages-workspace-active');
+
+    document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(modal => {
+      modal.classList.add('hidden');
+    });
+
+    const libModalBox = document.getElementById('lib-modal-box');
+    if (libModalBox) libModalBox.innerHTML = '';
+  },
+
+  _releasePressedState(actionEl, evt) {
+    // Preserve keyboard focus for accessibility; only blur for pointer-triggered clicks.
+    if (evt && evt.detail === 0) return;
+
+    if (actionEl && typeof actionEl.blur === 'function') actionEl.blur();
+
+    const active = document.activeElement;
+    if (active && typeof active.blur === 'function' && active.closest) {
+      const transientRegion = active.closest('#study-library-content, #lib-sidebar-body, .topbar-actions');
+      if (transientRegion) active.blur();
+    }
   },
 
   _clearSearch() {
