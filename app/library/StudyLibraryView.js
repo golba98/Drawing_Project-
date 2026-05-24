@@ -956,7 +956,10 @@ const StudyLibraryView = {
     if (libModalBox) libModalBox.innerHTML = '';
   },
 
-  _releasePressedState(actionEl) {
+  _releasePressedState(actionEl, evt) {
+    // Preserve keyboard focus for accessibility; only blur for pointer-triggered clicks.
+    if (evt && evt.detail === 0) return;
+
     if (actionEl && typeof actionEl.blur === 'function') actionEl.blur();
 
     const active = document.activeElement;
