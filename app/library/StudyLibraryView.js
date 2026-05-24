@@ -302,11 +302,19 @@ const StudyLibraryView = {
           break;
         }
 
-        case 'new-subject':
-        case 'more-actions':
-        case 'settings':
-          this._showComingSoon(action);
+        case 'new-subject': {
+          const yearId = LibraryState.selectedYearId;
+          const semesterId = LibraryState.selectedSemesterId;
+          if (yearId && semesterId) {
+            LibraryModal.open({
+              type: 'add-subject',
+              onSave: d => { LibraryStorage.addSubject(yearId, semesterId, d); this.render(); }
+            });
+          } else {
+            this._showToast('Open a semester before adding a subject.');
+          }
           break;
+        }
 
         default:
           console.warn(`Unhandled action: ${action}`);
@@ -944,11 +952,6 @@ const StudyLibraryView = {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-  },
-
-  _showComingSoon(action) {
-    const formatted = action.split('-').map(w => this._capitalize(w)).join(' ');
-    this._showToast(`${formatted} — Coming Soon`);
   },
 
   _showToast(message) {

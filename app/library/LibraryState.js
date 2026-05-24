@@ -8,6 +8,7 @@ const LibraryState = {
   selectedSubjectId: null,
   selectedTopicId: null,
   activeTopicTab: 'overview',
+  docEditorMode: null,  // null | 'notes' | 'pages'
   searchQuery: '',
   activeFilter: 'all'
 };
