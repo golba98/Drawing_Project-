@@ -31,6 +31,10 @@ const NotesView = {
     panelEl.addEventListener('input',  this._bound);
   },
 
+  renameActive() {
+    if (this._activeNoteId) this._renameNote(this._activeNoteId);
+  },
+
   unmount() {
     if (!this._panel) return;
 

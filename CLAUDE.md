@@ -1,66 +1,110 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Project
 
-## Running the App
+Drawing App
 
-No build step is required — this is a vanilla JS app. Serve it over HTTP (file:// won't work with some browser security restrictions):
+## Purpose
+
+A student academic notebook and drawing workspace for managing academic years, semesters, modules/resources, topics, notes, and full-page drawing pages.
+
+The app is a static browser project. It has no backend and currently stores user data in `localStorage`.
+
+## Important Project Path
+
+Work from the repository root. Do not hardcode local absolute paths or machine-specific paths in source or documentation.
+
+## Tech Stack
+
+- HTML, CSS, and vanilla JavaScript
+- Browser globals loaded by `index.html`
+- Browser `localStorage`
+- Canvas 2D API for Study Library drawing pages
+- p5.js for the legacy notebook drawing editor
+- Google Fonts loaded in `index.html`
+
+## Development Commands
+
+There is no `package.json`, no bundler, and no npm script set yet.
+
+Serve locally:
 
 ```bash
-python3 -m http.server 8000
-# or
-npx serve .
+python -m http.server 8000
 ```
 
-Then open `http://localhost:8000`. There is no npm, no bundler, no transpilation.
+Open:
 
-## Architecture
-
-The app has two views — a **file manager dashboard** and a **drawing editor** — coordinated by `AppState`. All data persists in `localStorage`; there is no backend.
-
-### Module Responsibilities
-
-| File | Role |
-|------|------|
-| `sketch.js` | p5.js global-mode sketch; owns the draw loop, canvas, mouse events, and `drawingLayer` (p5.Graphics) |
-| `app/AppState.js` | Navigation coordinator; holds current view and open notebook; views must not talk to each other directly |
-| `app/EditorView.js` | Editor lifecycle, toolbar wiring, autosave trigger |
-| `app/FileManagerView.js` | Notebook grid, create-notebook modal |
-| `app/StorageManager.js` | `localStorage` CRUD for notebook objects |
-| `app/ThemeManager.js` | Theme resolution (app-level → per-notebook → system OS preference) |
-| `ui/PageBackground.js` | Draws lined/blank page background at render time (never persisted) |
-| `tools/Toolbox.js` | Instantiates all tools; routes mouse events to the active tool |
-| `tools/*.js` | Individual tool implementations (Pen, Highlighter, Eraser, Line, Spray) |
-
-### Key Invariants
-
-- **`drawingLayer` stores only user strokes** — the page background is regenerated from `pageMode` on every load. Do not bake backgrounds into the layer.
-- **Eraser uses `layer.erase()`** — erased pixels become transparent, decoupling erase from page theme.
-- **Tools read p5 globals directly** (`penColor`, `penSize`, `drawingLayer`, etc.) because p5 runs in global mode. Tool files are loaded after `sketch.js` establishes these globals.
-- **Script load order matters** — `index.html` loads scripts via `<script defer>` in dependency order. Adding a new file requires inserting it in the correct position.
-- **Autosave fires on every completed action** (stroke end, page/theme switch, editor close) via `EditorView.autosave()`.
-- **Custom events** (`themeChanged`, `pageThemeChanged`) dispatched on `window` decouple theme updates from consumers.
-
-### Notebook Data Shape
-
-```js
-{
-  id:             string,      // time-based unique ID
-  title:          string,
-  subject:        string,      // category label
-  pageMode:       string,      // 'blank' | 'lined'
-  pageTheme:      string,      // 'light' | 'dark' | 'system'
-  coverColor:     string,      // CSS class suffix
-  drawingDataUrl: string|null, // base64 PNG of drawingLayer
-  createdAt:      number,
-  updatedAt:      number,
-}
+```text
+http://localhost:8000
 ```
 
-## Styling
+Syntax-check tracked JavaScript files:
 
-All styles live in `style.css` (~4300 lines) using CSS custom properties. The visual theme is **dark academic** with yellow/gold accents — navy and blue accent colors were intentionally replaced. Do not reintroduce blue/navy as accent colors.
+```powershell
+$files = git ls-files "*.js"; foreach ($file in $files) { node --check $file }
+```
 
-## No Tests
+Do not document `npm run build`, `npm run lint`, `npm run typecheck`, or `npm test` unless those scripts actually exist.
 
-There is no test runner. Manual browser testing is the only verification path.
+## Current UX Direction
+
+When a note, file/resource, or drawing page is opened, it should become the main document/editor workspace, similar to Microsoft Word or Google Docs. Do not trap opened documents inside small dashboard cards, widgets, or preview panels.
+
+Keep the existing structure:
+
+- Overview
+- Notes
+- Pages
+- Files/resources/library navigation
+- Academic year, semester, subject/module, and topic navigation
+
+Do not rebuild the app into a different semester/subject/topic architecture unless explicitly requested.
+
+## Drawing Pages
+
+Drawing pages must behave like full-page notebook canvases, not small image previews.
+
+Performance rules:
+
+- Do not store fast pointer-move drawing state in high-level app state.
+- Keep hot drawing paths inside canvas-specific code.
+- Batch pointer movement with `requestAnimationFrame` where possible.
+- Debounce persistence writes.
+- Avoid full app re-renders on every pointer move.
+- Preserve undo/redo behavior when switching tools or updating toolbar state.
+
+The current Study Library drawing page implementation lives mainly in `app/library/DrawingCanvas.js` and `app/library/SketchesView.js`.
+
+## Code Rules
+
+- Keep components focused and consistent with the existing browser-global style.
+- Preserve script load order in `index.html`; dependencies must load before files that use them.
+- Keep the dark academic/gold visual direction.
+- Keep note/page editor mode full-screen and document-like.
+- Preserve Overview, Notes, Pages, files/resources, and library navigation behavior.
+- Use safe practical wording in UI and docs.
+- Do not add fake stats, fake features, or placeholder marketing copy.
+- Do not perform broad architecture rewrites during cleanup tasks.
+
+## Public Repo Safety
+
+Before finalizing changes, check for:
+
+- Secrets, tokens, API keys, passwords, and private URLs
+- Personal emails
+- Absolute local user-profile paths
+- Real `.env` values
+- Generated files, build output, cache folders, debug dumps, screenshots, and recordings
+- `console.log` debugging, stale TODO/FIXME comments, and prototype wording
+
+Real `.env` files must stay ignored. If future environment variables are needed, document only safe placeholders in `.env.example`.
+
+## Do Not Do
+
+- Do not redesign the whole app without instruction.
+- Do not remove working Overview, Notes, Pages, files/resources, or navigation behavior.
+- Do not replace the document/editor workspace with card previews.
+- Do not add fake marketing copy or fake SaaS language.
+- Do not add fake features that are not implemented.
+- Do not commit or push unless explicitly asked.
